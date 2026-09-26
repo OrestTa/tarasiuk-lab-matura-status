@@ -1,5 +1,5 @@
 {
-  "updated": "2026-09-26T15:52:17+02:00",
+  "updated": "2026-09-26T14:08:03+00:00",
   "team": "Tarasiuk Lab",
   "hackathon": "Warsaw Model Trainers — Polish history matura",
   "tracks": {
@@ -8,7 +8,9 @@
       "highlights": [
         "Bare Qwen2.5-7B-Instruct-AWQ stays the best legal CKE lane: 37.6% full / 38.9% text-only.",
         "Measured AWQ pack is about 5.582 GB, inside the 8.0 GB base and 8.8 GB after-FT caps.",
+        "Official mock history-2023-mock-v1 is now format-complete on bare Qwen2.5-7B-Instruct-AWQ via Forgehand L40S: 37/37 nonempty answers, essay regenerated to 811 words; this is status-only, not an official grade.",
         "AWQ + forgehand fh LoRA (offline) scored 29.8% full / 32.1% text-only and is demoted from the Sunday path.",
+        "Next official mock lane is Bielik-4.5B FP8 via vLLM under the <=8.0 GB base cap; no Bielik-11B public run is planned.",
         "No secrets, keys, or private IPs are carried in the public refresh payload."
       ]
     },
@@ -24,7 +26,8 @@
     "history_ext_multi_year": {
       "role": "History Ext multi-year",
       "highlights": [
-        "May 2024/2025/2026 packs converted locally (exam.json+images); pack-aware harness --pack-dir smoke-tested; official mock remains only gauge; packs not published (CKE copyright)"
+        "May 2024/2025/2026 packs converted locally (exam.json+images); pack-aware harness --pack-dir smoke-tested; official mock remains only gauge; packs not published (CKE copyright)",
+        "history-2023-mock-v1 bare AWQ run is format-complete with 37/37 nonempty answers and an 811-word essay after regen; publish it only as status, not as an official grade."
       ]
     }
   },
@@ -216,6 +219,18 @@
       "name": "CKE 7B AWQ + fh LoRA (offline)",
       "state": "COMPLETED",
       "detail": "29.8% full / 32.1% text-only; regression vs bare AWQ, demoted"
+    },
+    {
+      "id": "official-mock-awq7b-history-2023",
+      "name": "Official mock AWQ-7B - history-2023-mock-v1",
+      "state": "COMPLETED",
+      "detail": "Format-complete only, not an official grade: bare Qwen2.5-7B-Instruct-AWQ on Forgehand L40S; 37/37 nonempty answers; essay 811 words after regen; wall ~157s once running"
+    },
+    {
+      "id": "official-mock-bielik-45b-fp8",
+      "name": "Official mock Bielik-4.5B FP8 - history-2023-mock-v1",
+      "state": "RUNNING",
+      "detail": "vLLM lane in progress under the <=8.0 GB base cap; no Bielik-11B public run planned"
     },
     {
       "id": "cke-3b-history-v2",
