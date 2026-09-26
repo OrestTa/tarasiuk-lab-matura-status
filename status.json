@@ -11,6 +11,7 @@
         "Parallel Grok cloud grades on the same packs: Bielik-4.5B FP8 28/60 = 46.7%; AWQ 20/60 = 33.3% (harness OCR+essay_regen); E2E Qwen2.5-3B 15/60 = 25.0%.",
         "CKE headline-auto 37.6% for bare 7B AWQ is unverified auto-scored (70 pts) — not a graded official mock.",
         "Measured packs: AWQ ~5.58 GB; Bielik-4.5B FP8 ~4.90 GB; Bielik-11B-v2 NF4 ship.json ~6.66 GB — all inside 8.0/8.8 caps.",
+        "Bielik-11B bf16 remains banned on every track under the 8.0/8.8 pack caps; Bielik-11B-v2 NF4 stays live for Best Progress only.",
         "No secrets, keys, or private IPs in this public refresh.",
         "Track 02: Bielik-11B-v2 NF4 routed harness 26.9% vs raw 25.5% (+1.4 pp)."
       ]
@@ -20,7 +21,7 @@
       "highlights": [
         "Commit audit: relabel 37.6% as headline-auto; prefer Claude-graded official-mock rows in tracks.json.",
         "C-013: mark official_mock_awq7b as harness (ocr_fallback + essay_regen), not untouched base.",
-        "Progress base must stay pretrained Bielik-11B-v2 NF4 (~6.7 GB), not Instruct-AWQ v3.",
+        "Progress base must stay pretrained Bielik-11B-v2 NF4 (~6.7 GB), the declared organisers base for Best Progress only; do not swap to Instruct-AWQ v3.",
         "Claude grades on request via BOT_CHANNEL JUDGE: protocol; Claude must not issue VM/GPU jobs."
       ]
     },
@@ -274,7 +275,7 @@
       "title": "Best progress",
       "goal": "Largest tuned minus honest bare-base improvement on the Sunday exam.",
       "status": "RUNNING",
-      "summary": "Same-HF-base pair locked: Bielik-11B-v2 NF4 raw 25.5% → routed harness 26.9% (Δ +1.4 pp). progress-dapt next. Gauge is matura_all holdout (not yet history-2023-mock-v1). Proxy 3B CKE +1.6 still secondary.",
+      "summary": "Same-HF-base pair locked: Bielik-11B-v2 NF4 raw 25.5% → routed harness 26.9% (Δ +1.4 pp). Declared organisers base stays this NF4 pack for Best Progress only; progress-dapt next. Gauge is matura_all holdout (not yet history-2023-mock-v1). Proxy 3B CKE +1.6 still secondary.",
       "sections": [
         {
           "title": "Baselines (honest bare)",
@@ -378,7 +379,7 @@
       "id": "size-cap",
       "name": "Size cap hard 8.0/8.8",
       "state": "ACTIVE",
-      "detail": "Quantized on-disk pack size is the rule; bf16-only oversize stays illegal"
+      "detail": "Quantized on-disk pack size is the rule; bf16-only oversize stays illegal, while Bielik-11B-v2 NF4 remains legal for Best Progress."
     },
     {
       "id": "qwen-7b-bf16",
@@ -445,8 +446,8 @@
   },
   "audit": {
     "size_cap_conflicts": [
-      "docs/STATUS.md tip still lists queued Bielik-11B bf16 DAPT/train/shootout rows; keep cancel_requested and do not re-admit bf16 bases.",
-      "Bielik-11B-v2 NF4 ~6.66 GB is legal; Instruct-AWQ v3 must not be filed as the progress base."
+      "Any stale cancel-all-11B wording must apply only to queued Bielik-11B bf16 DAPT/train/shootout rows; keep those cancel_requested and do not re-admit bf16 bases.",
+      "Bielik-11B-v2 NF4 ~6.66 GB is legal under the pack caps and stays the declared Best Progress base; Instruct-AWQ v3 must not be filed as that progress base."
     ],
     "score_conflicts": [
       "Grok vs Claude official-mock totals disagree on identical answers (AWQ 33.3 vs 18.3; Bielik 46.7 vs 40.0).",
