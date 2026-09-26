@@ -1,5 +1,5 @@
 {
-  "updated": "2026-09-26T15:40:20+02:00",
+  "updated": "2026-09-26T15:52:17+02:00",
   "team": "Tarasiuk Lab",
   "hackathon": "Warsaw Model Trainers — Polish history matura",
   "tracks": {
@@ -19,6 +19,12 @@
         "The fh offline stage remains visible as a completed regression, not a promoted Sunday pack candidate.",
         "3B line still reads: base 26.7%, history-v2 28.3%, modal-v3 17.1%.",
         "Sunday quality path: declare bare 7B AWQ if registration can still move; otherwise keep the current 3B declaration honest."
+      ]
+    },
+    "history_ext_multi_year": {
+      "role": "History Ext multi-year",
+      "highlights": [
+        "May 2024/2025/2026 packs converted locally (exam.json+images); pack-aware harness --pack-dir smoke-tested; official mock remains only gauge; packs not published (CKE copyright)"
       ]
     }
   },
@@ -240,6 +246,12 @@
       "name": "Qwen 7B bf16 comparator",
       "state": "BLOCKED",
       "detail": "37.1% / 40.1%; research-only because the base is over the Sunday cap"
+    },
+    {
+      "id": "history-ext-pack-conversion",
+      "name": "History Ext pack conversion",
+      "state": "COMPLETED",
+      "detail": "May 2024, May 2025, May 2026 converted locally (exam.json+images); pack-aware harness ready (--pack-dir smoke-tested)"
     }
   ],
   "mcq": {
