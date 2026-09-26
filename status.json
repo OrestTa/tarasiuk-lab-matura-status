@@ -1,5 +1,5 @@
 {
-  "updated": "2026-09-26T15:52:17+02:00",
+  "updated": "2026-09-26T14:10:15+00:00",
   "team": "Tarasiuk Lab",
   "hackathon": "Warsaw Model Trainers — Polish history matura",
   "tracks": {
@@ -24,7 +24,7 @@
     "history_ext_multi_year": {
       "role": "History Ext multi-year",
       "highlights": [
-        "May 2024/2025/2026 packs converted locally (exam.json+images); pack-aware harness --pack-dir smoke-tested; official mock remains only gauge; packs not published (CKE copyright)"
+        "May 2024/2025/2026 packs converted locally (exam.json+images); pack-aware harness --pack-dir smoke-tested; official mock format-complete passes now exist for AWQ-7B and Bielik-4.5B FP8, but public grades are still unpublished; packs not published (CKE copyright)"
       ]
     }
   },
@@ -205,6 +205,24 @@
     }
   ],
   "jobs": [
+    {
+      "id": "official-mock-bielik45-fp8",
+      "name": "Official mock Bielik-4.5B FP8",
+      "state": "COMPLETED",
+      "detail": "37/37 nonempty; essay ~418 words; wall ~115s via concurrent vLLM (8-wide, ~19 items/min); pack ~4.90 GB under the 8.0 GB cap; format-complete only, not official grades"
+    },
+    {
+      "id": "official-mock-awq-7b",
+      "name": "Official mock AWQ-7B",
+      "state": "COMPLETED",
+      "detail": "37/37 nonempty; essay 811 words; wall ~157s serial; completed earlier the same day; format-complete only, not official grades"
+    },
+    {
+      "id": "forgehand-l40s-lock",
+      "name": "Forgehand L40S lock",
+      "state": "COMPLETED",
+      "detail": "Cleared after the Bielik-4.5B FP8 official mock run; other progress jobs are unblocked"
+    },
     {
       "id": "cke-7b-awq-base",
       "name": "CKE 7B AWQ base",
