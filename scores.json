@@ -1,10 +1,10 @@
 {
-  "updated": "2026-09-26T18:46:46+02:00",
+  "updated": "2026-09-26T20:00:00+02:00",
   "stages": [
     {
       "id": "mock-gemma4-12b-qat-may2023-claude",
       "sort": 4,
-      "name": "May 2023 CKE Gemma 4 12B QAT (Claude)",
+      "name": "May 2023 CKE Gemma 4 12B QAT + pictures (Claude)",
       "model": "Gemma 4 12B QAT GGUF + mmproj",
       "stage": "base",
       "status": "COMPLETED",
@@ -15,7 +15,7 @@
       "image_open": null,
       "image_closed": null,
       "essay": null,
-      "note": "Claude master 41/60 = 68.3% on paper 2023-05 (May 2023 CKE), coarse only: closed 8/11, open 24/34, essay 9/15. Five CKE text/vision category % unknown, so five cats stay null. Measured pack 7.16 GB on disk (6.98 GGUF + 0.18 mmproj), legal under the 8.0/8.8 quantized pack rules. This is May 2023 paper, not the standing gauge history-2023-mock-v1 unless/until that mock is also graded for Gemma. 6/37 answers were empty from a thinking-on bug fixed in trainers 6359957. Grok/Sol dual-judge not yet run on this answer set.",
+      "note": "Best verified score so far. Claude-graded 41/60 = 68.3% on the May 2023 CKE paper (same paper as history-2023-mock-v1): closed 8/11, open 24/34, essay 9/15. 7.16 GB on disk (6.98 GGUF + 0.18 mmproj), under the 8.0 GB cap. 6/37 answers were empty from the thinking-on bug fixed in 6359957. Sol second judge not yet run. Five text/vision columns not computed.",
       "source": "results/judged/matura-judge-claude-gemma4-12b-vision-raw-2023-20260926-1617-g4vr/claude_score.json"
     },
     {
@@ -32,12 +32,12 @@
       "image_open": null,
       "image_closed": null,
       "essay": null,
-      "note": "Claude-graded 24/60 vs CKE key on harness answer-sheet / structured-layout answers; ~4.90 GB on-disk FP8 pack. Current best verified official-mock score under caps.",
+      "note": "Claude-graded 24/60 = 40.0% vs the CKE key; answers had the pictures' printed text via OCR (text + OCR harness, not untouched base). 4.90 GB on disk. Smallest safe entry (≥35%); second to Gemma 4 on score.",
       "source": "results/tracks.json#g-official-mock-bielik45-fp8-claude"
     },
     {
       "id": "mock-e2e-3b-grok",
-      "sort": 18,
+      "sort": 20,
       "name": "E2E 2023 mock Qwen2.5-3B (Grok)",
       "model": "Qwen2.5 3B",
       "stage": "harness",
@@ -58,7 +58,7 @@
       "name": "Bielik-11B-v2 NF4 bare raw",
       "model": "Bielik-11B-v2 NF4",
       "stage": "base",
-      "status": "COMPLETED",
+      "status": "UNVERIFIED",
       "honest_bare": true,
       "overall_pct": 25.5,
       "text_open": null,
@@ -66,7 +66,7 @@
       "image_open": null,
       "image_closed": null,
       "essay": null,
-      "note": "Raw plain-prompt base; harness cats, not five CKE; 6.66 GB disk. UNVERIFIED until results/progress/summary.json and ship.json land in the hackathon repo."
+      "note": "matura_all holdout plain-prompt proxy 25.5% (harness categories, not the CKE key), 6.66 GB. UNVERIFIED: no answers or summary for this run are committed in the repo."
     },
     {
       "id": "progress-nf4-routed",
@@ -74,7 +74,7 @@
       "name": "Bielik-11B-v2 NF4 routed harness",
       "model": "Bielik-11B-v2 NF4",
       "stage": "harness",
-      "status": "COMPLETED",
+      "status": "UNVERIFIED",
       "base_stage_id": "progress-nf4-raw",
       "overall_pct": 26.9,
       "text_open": null,
@@ -82,7 +82,7 @@
       "image_open": null,
       "image_closed": null,
       "essay": null,
-      "note": "Same pack routed harness; Δ +1.4 pp vs raw. UNVERIFIED until results/progress/summary.json and ship.json land in the hackathon repo.",
+      "note": "Same pack, routed harness, matura_all proxy 26.9% (+1.4 pp vs raw). UNVERIFIED: no answers committed; a harness score, not a trained model.",
       "honest_bare": false
     },
     {

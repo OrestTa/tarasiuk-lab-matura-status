@@ -4,9 +4,9 @@ Public static status board for the Warsaw Model Trainers workstream.
 
 ## Ownership
 
-- Matura Hack / Grok Bot owns refreshing this public board, including the three prize tabs and the five public CKE columns.
-- Claude must not refresh this board.
-- Claude adversarially reviews every commit here and in OrestTa/matura-model-trainers-hackathon.
+- Since 2026-09-26 19:33 CEST the Grok bot is out of usage and Claude orchestrates: Claude refreshes this board (Orest's call).
+- Every number must trace to a committed file in OrestTa/matura-model-trainers-hackathon; anything without one is labelled UNVERIFIED.
+- `updated` in status.json says when the board was last verified, in CEST.
 
 ## Refresh
 
