@@ -1,28 +1,24 @@
 {
-  "updated": "2026-09-26T14:33:36.207784+02:00",
+  "updated": "2026-09-26T15:22:25+02:00",
   "team": "Tarasiuk Lab",
   "hackathon": "Warsaw Model Trainers — Polish history matura",
   "tracks": {
     "matura_hack_grok": {
       "role": "Matura Hack (Grok Bot)",
       "highlights": [
-        "HARD size caps: base ≤8.0 GB, after FT (base+adapters) ≤8.8 GB — see notes/SIZE_CAP_8GB.md",
-        "GPTQ-Int8 7B (8.875 GB) ILLEGAL as Sunday base; switch to AWQ (~5.58 GB) or stay on 3B (~6.18 GB)",
-        "Cancel: Bielik-11B / dapt-bielik / train-bielik / 11B baselines; SIGTERM bf16-7B oversize evals when SSH up",
-        "PARALLEL L40S: live cke_3b_history_v2 (~9GB) + cke_7b_fh (~15GB); queue cke_7b_fh_v2",
-        "CKE done: 3B base 26.7%, 3B modal-v3 17.1%, 7B base 37.1% (scored subset)",
-        "fh-v2 LoRA train + dl7b COMPLETED; gpu_admit reservations active"
+        "Headline CKE on matura.jsonl: 7B AWQ base 37.6% (best legal so far)",
+        "Size caps: base ≤8.0 GB, after FT ≤8.8 GB; GPTQ-Int8 and 11B Sunday bases are out",
+        "3B line: base 26.7%, history-v2 28.3%, modal-v3 17.1%",
+        "Current shared GPU story: current Forgehand L40S plus completed AWQ / Modal result passes"
       ]
     },
     "claude": {
       "role": "Claude Opus on trunk",
       "highlights": [
-        "STOP oversize: Bielik-11B bf16 (~22.3 GB) — do not DAPT/train/serve for Sunday; caps base≤8.0 afterFT≤8.8",
-        "gpu_admit.py — share L40S by free GB (not exclusive card)",
-        "dapt-prep corpus OK (CPU); do NOT start dapt-bielik/train-bielik on 11B",
-        "Queue: retarget baselines to ≤8 GB bases (3B / AWQ-7B / Bielik-4.5 FP8); no 11B",
-        "matura_all = 512 items / 789 pts (dup EHIP dropped); headline May 23–26",
-        "MODELS=all skips -bf16; AWS needs AWS_REENABLED=1"
+        "Sunday quality path: declare 7B AWQ if registration can still be updated; otherwise keep 3B honest",
+        "Never use bf16-7B, GPTQ-Int8 8.875, or Bielik-11B as the Sunday base",
+        "Headline remains the committed CKE May 23–26 eval, not the 90-question MCQ dev set",
+        "Shared notes should say only current Forgehand L40S and should never carry IPs, SSH keys, or secrets"
       ]
     }
   },
@@ -42,7 +38,7 @@
       "image_closed": null,
       "essay": null,
       "note": "Scored subset. Per-category public splits are not published yet.",
-      "source": "status.json placeholder awaiting public CKE output"
+      "source": "scores.json placeholder awaiting public CKE output"
     },
     {
       "id": "cke-3b-modal",
@@ -59,7 +55,7 @@
       "image_closed": null,
       "essay": null,
       "note": "Per-category public splits are not published yet.",
-      "source": "status.json placeholder awaiting public CKE output"
+      "source": "scores.json placeholder awaiting public CKE output"
     },
     {
       "id": "cke-3b-history-v2",
@@ -67,48 +63,49 @@
       "name": "3B history-v2",
       "model": "Qwen2.5 3B",
       "stage": "history-v2",
-      "status": "RUNNING",
-      "base_stage_id": "cke-3b-base",
-      "text_open": null,
-      "text_closed": null,
-      "image_open": null,
-      "image_closed": null,
-      "essay": null,
-      "note": "Run active. Publish the five-way split when the eval artifact is public.",
-      "source": "status.json placeholder awaiting public CKE output"
-    },
-    {
-      "id": "cke-7b-base",
-      "sort": 40,
-      "name": "7B base",
-      "model": "Qwen2.5 7B",
-      "stage": "base",
       "status": "COMPLETED",
-      "honest_bare": true,
-      "overall_pct": 37.1,
+      "base_stage_id": "cke-3b-base",
+      "overall_pct": 28.3,
       "text_open": null,
       "text_closed": null,
       "image_open": null,
       "image_closed": null,
       "essay": null,
       "note": "Scored subset. Per-category public splits are not published yet.",
-      "source": "status.json placeholder awaiting public CKE output"
+      "source": "scores.json placeholder awaiting public CKE output"
+    },
+    {
+      "id": "cke-7b-awq-base",
+      "sort": 40,
+      "name": "7B AWQ base",
+      "model": "Qwen2.5 7B AWQ",
+      "stage": "base",
+      "status": "COMPLETED",
+      "honest_bare": true,
+      "overall_pct": 37.6,
+      "text_open": null,
+      "text_closed": null,
+      "image_open": null,
+      "image_closed": null,
+      "essay": null,
+      "note": "Scored 60/154; text-only 38.9%. Per-category public splits are not published yet.",
+      "source": "scores.json placeholder awaiting public CKE output"
     },
     {
       "id": "cke-7b-fh",
       "sort": 50,
-      "name": "7B fh",
+      "name": "7B fh (bf16 lane)",
       "model": "Qwen2.5 7B",
       "stage": "fh",
-      "status": "CANCEL_REQUESTED",
-      "base_stage_id": "cke-7b-base",
+      "status": "BLOCKED",
+      "base_stage_id": "cke-7b-awq-base",
       "text_open": null,
       "text_closed": null,
       "image_open": null,
       "image_closed": null,
       "essay": null,
       "note": "Illegal bf16 base under the 8.0/8.8 GB caps. No published category scores.",
-      "source": "status.json placeholder awaiting public CKE output"
+      "source": "scores.json placeholder awaiting public CKE output"
     },
     {
       "id": "cke-7b-fh-v2",
@@ -116,15 +113,15 @@
       "name": "7B fh-v2",
       "model": "Qwen2.5 7B",
       "stage": "fh-v2",
-      "status": "CANCEL_REQUESTED",
-      "base_stage_id": "cke-7b-base",
+      "status": "BLOCKED",
+      "base_stage_id": "cke-7b-awq-base",
       "text_open": null,
       "text_closed": null,
       "image_open": null,
       "image_closed": null,
       "essay": null,
       "note": "Queued on an illegal bf16 base. No published category scores.",
-      "source": "status.json placeholder awaiting public CKE output"
+      "source": "scores.json placeholder awaiting public CKE output"
     }
   ],
   "prize_tracks": [
@@ -133,11 +130,11 @@
       "title": "Best matura score",
       "goal": "Highest honest Sunday exam score under the 8.0 GB base / 8.8 GB after-FT caps.",
       "status": "RUNNING",
-      "summary": "7B base is the current public honest leader at 37.1%; tuned successors still need valid public eval outputs.",
+      "summary": "7B AWQ base is the current public honest leader at 37.6%; tuned successors still need valid public eval outputs.",
       "sections": [
         {
           "title": "Baselines (honest bare)",
-          "stage_ids": ["cke-3b-base", "cke-7b-base"]
+          "stage_ids": ["cke-3b-base", "cke-7b-awq-base"]
         },
         {
           "title": "Interim results",
@@ -154,11 +151,11 @@
       "title": "Best progress",
       "goal": "Largest tuned minus honest bare-base improvement on the Sunday exam.",
       "status": "RUNNING",
-      "summary": "Publicly scored tuned runs do not yet beat their honest bare bases; pending runs are still in flight or invalidated by cap violations.",
+      "summary": "3B history-v2 is the only published positive lift so far (+1.6 over 3B base); 7B tuned bf16 lanes are invalid under the size caps.",
       "sections": [
         {
           "title": "Baselines (honest bare)",
-          "stage_ids": ["cke-3b-base", "cke-7b-base"]
+          "stage_ids": ["cke-3b-base", "cke-7b-awq-base"]
         },
         {
           "title": "Interim results",
@@ -175,11 +172,11 @@
       "title": "Mały ale wariat",
       "goal": "Smallest model that still reaches at least 35% on the honest Sunday exam.",
       "status": "BLOCKED",
-      "summary": "No ≤3B public run has cleared 35% yet; 3B history-v2 is the main pending attempt while 7B base is the current qualifying benchmark at 37.1%.",
+      "summary": "No ≤3B public run has cleared 35% yet; 3B history-v2 reached 28.3%, while 7B AWQ is the current qualifying benchmark at 37.6%.",
       "sections": [
         {
           "title": "Baselines (honest bare)",
-          "stage_ids": ["cke-3b-base", "cke-7b-base"]
+          "stage_ids": ["cke-3b-base", "cke-7b-awq-base"]
         },
         {
           "title": "Interim results",
@@ -194,84 +191,46 @@
   ],
   "jobs": [
     {
-      "id": "fh-7b-v2",
-      "name": "Forgehand 7B LoRA fh-v2",
-      "state": "COMPLETED"
+      "id": "cke-7b-awq-base",
+      "name": "CKE 7B AWQ base",
+      "state": "COMPLETED",
+      "detail": "37.6% full / 38.9% text-only; measured pack ~5.582 GB"
     },
     {
-      "id": "mcq-7b-family",
-      "name": "MCQ 7B base/fh/fh-v2",
+      "id": "cke-3b-history-v2",
+      "name": "CKE 3B history-v2",
       "state": "COMPLETED",
-      "detail": "76.7/100/98.9"
+      "detail": "28.3% / 31.3%; small lift vs 3B base"
     },
     {
       "id": "cke-3b-base",
       "name": "CKE 3B base",
       "state": "COMPLETED",
-      "detail": "26.7%"
+      "detail": "26.7% / 27.4%"
     },
     {
       "id": "cke-3b-modal",
       "name": "CKE 3B modal-v3",
       "state": "COMPLETED",
-      "detail": "17.1%"
-    },
-    {
-      "id": "cke-3b-history-v2",
-      "name": "CKE 3B history-v2",
-      "state": "RUNNING"
-    },
-    {
-      "id": "cke-7b-base",
-      "name": "CKE 7B base",
-      "state": "COMPLETED",
-      "detail": "37.1%"
+      "detail": "17.1% / 23.0%; regression vs base"
     },
     {
       "id": "cke-7b-fh",
-      "name": "CKE 7B fh (bf16 base)",
-      "state": "CANCEL_REQUESTED",
-      "detail": "bf16~15.2GB; SIGTERM when SSH"
+      "name": "CKE 7B fh (bf16 lane)",
+      "state": "BLOCKED",
+      "detail": "cancel_requested; illegal Sunday base"
     },
     {
-      "id": "cke-7b-fh-v2",
-      "name": "CKE 7B fh-v2",
-      "state": "CANCEL_REQUESTED",
-      "detail": "queued on illegal bf16 base"
+      "id": "qwen-7b-gptq-int8",
+      "name": "Qwen 7B GPTQ-Int8",
+      "state": "PARKED",
+      "detail": "8.875 GB on disk; illegal Sunday base"
     },
     {
-      "id": "gpu-parallel",
-      "name": "gpu_par + gpu_admit",
-      "state": "RUNNING"
-    },
-    {
-      "id": "dl7b",
-      "name": "7B HF download",
-      "state": "COMPLETED"
-    },
-    {
-      "id": "size-cap",
-      "name": "Size cap hard 8.0/8.8",
-      "state": "ACTIVE",
-      "detail": "SIZE_CAP_8GB.md; GPTQ-Int8 demoted"
-    },
-    {
-      "id": "dapt-bielik",
-      "name": "dapt-bielik (11B)",
-      "state": "CANCEL_REQUESTED",
-      "detail": "base~22.3GB illegal"
-    },
-    {
-      "id": "train-bielik",
-      "name": "train-bielik-l40s",
-      "state": "CANCEL_REQUESTED",
-      "detail": "depends on illegal 11B"
-    },
-    {
-      "id": "baselines-11b",
-      "name": "baselines bielik-11b serve",
-      "state": "CANCEL_REQUESTED",
-      "detail": "exam path illegal"
+      "id": "bielik-11b",
+      "name": "Bielik-11B lanes",
+      "state": "PARKED",
+      "detail": "cancel_requested; illegal Sunday base"
     }
   ],
   "mcq": {
@@ -295,22 +254,22 @@
     "3b_modal_v3": {
       "pct": 94.4,
       "n": "85/90",
-      "note": "contaminated — not matura"
+      "note": "contaminated — not headline evidence"
     },
     "7b_base": {
       "pct": 76.7,
       "n": "69/90",
-      "note": "COMPLETED — same 90-MCQ train set; not matura proof"
+      "note": "dev-only MCQ set, not matura proof"
     },
     "7b_fh": {
       "pct": 100.0,
       "n": "90/90",
-      "note": "COMPLETED — same 90-MCQ train set; not matura proof"
+      "note": "contaminated — same 90-MCQ train set"
     },
     "7b_fh_v2": {
       "pct": 98.9,
       "n": "89/90",
-      "note": "COMPLETED — same 90-MCQ train set; not matura proof"
+      "note": "contaminated — same 90-MCQ train set"
     },
     "7b_family": {
       "base_pct": 76.7,
@@ -327,7 +286,7 @@
     "max_base_disk_gb": 8.0,
     "max_after_ft_gb": 8.8,
     "exam": "fully offline Sunday",
-    "registration_base": "prefer Qwen2.5-3B (~6.18 GB); 7B only AWQ/GPTQ-Int4 ≤8.0 — NOT GPTQ-Int8 (8.875) or bf16",
+    "registration_base": "registered 3B today; AWQ 7B only if registration is updated",
     "matura_all": "512 items / 789 pts",
     "adapters_count_toward_after_ft": true,
     "cancel": "Bielik-11B bf16 / dapt-bielik / train-bielik / 7B bf16-as-base / GPTQ-Int8 as declared base",
@@ -341,23 +300,8 @@
     "public_board": "https://orestta.github.io/tarasiuk-lab-matura-status/"
   },
   "parallel": {
-    "gpu": "Forgehand L40S 46068 MiB single session",
+    "gpu": "current Forgehand L40S shared session",
     "mps": true,
-    "scheduler": "scripts/gpu_parallel_jobs.sh",
-    "gpu_admit_reservations_gb": {
-      "cke_3b_history_v2": 9,
-      "cke_7b_fh": 20,
-      "gpu_par": 0
-    },
-    "live_slots": [
-      "cke_3b_history_v2~6.5GiB",
-      "cke_7b_fh~15.3GiB"
-    ],
-    "used_mib_approx": 21926,
-    "queued": [
-      "cke_7b_fh_v2@20GiB"
-    ],
-    "mcq_7b_done": true,
-    "cke_7b_base_done": true
+    "scheduler": "scripts/gpu_parallel_jobs.sh"
   }
 }

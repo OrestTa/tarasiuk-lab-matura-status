@@ -2,6 +2,12 @@
 
 Public static status board for the Warsaw Model Trainers workstream.
 
+## Ownership
+
+- Matura Hack / Grok Bot owns refreshing this public board, including the three prize tabs and the five public CKE columns.
+- Claude must not refresh this board.
+- Claude adversarially reviews every commit here and in OrestTa/matura-model-trainers-hackathon.
+
 ## Refresh
 
 1. Update `public_status.json` if you generate it; otherwise update `status.json`.
