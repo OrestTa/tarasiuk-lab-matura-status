@@ -1,0 +1,117 @@
+{
+  "updated": "2026-09-26T14:33:36.207784+02:00",
+  "categories": [
+    { "id": "text_open", "label": "text open" },
+    { "id": "text_closed", "label": "text closed" },
+    { "id": "image_open", "label": "image open" },
+    { "id": "image_closed", "label": "image closed" },
+    { "id": "essay", "label": "essay" }
+  ],
+  "cke_runs": [
+    {
+      "id": "cke-3b-base",
+      "sort": 10,
+      "label": "3B base",
+      "model": "Qwen2.5 3B",
+      "stage": "base",
+      "status": "COMPLETED",
+      "overall_pct": 26.7,
+      "note": "Scored subset. Per-category public splits are not published yet.",
+      "source": "scores.json placeholder awaiting public CKE output",
+      "categories": {
+        "text_open": null,
+        "text_closed": null,
+        "image_open": null,
+        "image_closed": null,
+        "essay": null
+      }
+    },
+    {
+      "id": "cke-3b-modal",
+      "sort": 20,
+      "label": "3B modal-v3",
+      "model": "Qwen2.5 3B",
+      "stage": "modal-v3",
+      "status": "COMPLETED",
+      "overall_pct": 17.1,
+      "note": "Per-category public splits are not published yet.",
+      "source": "scores.json placeholder awaiting public CKE output",
+      "categories": {
+        "text_open": null,
+        "text_closed": null,
+        "image_open": null,
+        "image_closed": null,
+        "essay": null
+      }
+    },
+    {
+      "id": "cke-3b-history-v2",
+      "sort": 30,
+      "label": "3B history-v2",
+      "model": "Qwen2.5 3B",
+      "stage": "history-v2",
+      "status": "RUNNING",
+      "note": "Run active. Publish the five-way split when the eval artifact is public.",
+      "source": "scores.json placeholder awaiting public CKE output",
+      "categories": {
+        "text_open": null,
+        "text_closed": null,
+        "image_open": null,
+        "image_closed": null,
+        "essay": null
+      }
+    },
+    {
+      "id": "cke-7b-base",
+      "sort": 40,
+      "label": "7B base",
+      "model": "Qwen2.5 7B",
+      "stage": "base",
+      "status": "COMPLETED",
+      "overall_pct": 37.1,
+      "note": "Scored subset. Per-category public splits are not published yet.",
+      "source": "scores.json placeholder awaiting public CKE output",
+      "categories": {
+        "text_open": null,
+        "text_closed": null,
+        "image_open": null,
+        "image_closed": null,
+        "essay": null
+      }
+    },
+    {
+      "id": "cke-7b-fh",
+      "sort": 50,
+      "label": "7B fh",
+      "model": "Qwen2.5 7B",
+      "stage": "fh",
+      "status": "CANCEL_REQUESTED",
+      "note": "Illegal bf16 base under the 8.0/8.8 GB caps. No published category scores.",
+      "source": "scores.json placeholder awaiting public CKE output",
+      "categories": {
+        "text_open": null,
+        "text_closed": null,
+        "image_open": null,
+        "image_closed": null,
+        "essay": null
+      }
+    },
+    {
+      "id": "cke-7b-fh-v2",
+      "sort": 60,
+      "label": "7B fh-v2",
+      "model": "Qwen2.5 7B",
+      "stage": "fh-v2",
+      "status": "CANCEL_REQUESTED",
+      "note": "Queued on an illegal bf16 base. No published category scores.",
+      "source": "scores.json placeholder awaiting public CKE output",
+      "categories": {
+        "text_open": null,
+        "text_closed": null,
+        "image_open": null,
+        "image_closed": null,
+        "essay": null
+      }
+    }
+  ]
+}

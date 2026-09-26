@@ -1,12 +1,12 @@
 {
   "updated": "2026-09-26T14:33:36.207784+02:00",
   "team": "Tarasiuk Lab",
-  "hackathon": "Warsaw Model Trainers \u2014 Polish history matura",
+  "hackathon": "Warsaw Model Trainers — Polish history matura",
   "tracks": {
     "matura_hack_grok": {
       "role": "Matura Hack (Grok Bot)",
       "highlights": [
-        "HARD size caps: base \u22648.0 GB, after FT (base+adapters) \u22648.8 GB \u2014 see notes/SIZE_CAP_8GB.md",
+        "HARD size caps: base ≤8.0 GB, after FT (base+adapters) ≤8.8 GB — see notes/SIZE_CAP_8GB.md",
         "GPTQ-Int8 7B (8.875 GB) ILLEGAL as Sunday base; switch to AWQ (~5.58 GB) or stay on 3B (~6.18 GB)",
         "Cancel: Bielik-11B / dapt-bielik / train-bielik / 11B baselines; SIGTERM bf16-7B oversize evals when SSH up",
         "PARALLEL L40S: live cke_3b_history_v2 (~9GB) + cke_7b_fh (~15GB); queue cke_7b_fh_v2",
@@ -17,14 +17,136 @@
     "claude": {
       "role": "Claude Opus on trunk",
       "highlights": [
-        "STOP oversize: Bielik-11B bf16 (~22.3 GB) \u2014 do not DAPT/train/serve for Sunday; caps base\u22648.0 afterFT\u22648.8",
-        "gpu_admit.py \u2014 share L40S by free GB (not exclusive card)",
+        "STOP oversize: Bielik-11B bf16 (~22.3 GB) — do not DAPT/train/serve for Sunday; caps base≤8.0 afterFT≤8.8",
+        "gpu_admit.py — share L40S by free GB (not exclusive card)",
         "dapt-prep corpus OK (CPU); do NOT start dapt-bielik/train-bielik on 11B",
-        "Queue: retarget baselines to \u22648 GB bases (3B / AWQ-7B / Bielik-4.5 FP8); no 11B",
-        "matura_all = 512 items / 789 pts (dup EHIP dropped); headline May 23\u201326",
+        "Queue: retarget baselines to ≤8 GB bases (3B / AWQ-7B / Bielik-4.5 FP8); no 11B",
+        "matura_all = 512 items / 789 pts (dup EHIP dropped); headline May 23–26",
         "MODELS=all skips -bf16; AWS needs AWS_REENABLED=1"
       ]
     }
+  },
+  "cke": {
+    "categories": [
+      { "id": "text_open", "label": "text open" },
+      { "id": "text_closed", "label": "text closed" },
+      { "id": "image_open", "label": "image open" },
+      { "id": "image_closed", "label": "image closed" },
+      { "id": "essay", "label": "essay" }
+    ],
+    "preferred_sources": [
+      "./public_status.json",
+      "./scores.json",
+      "./status.json"
+    ],
+    "missing_breakdown_note": "Missing category values must remain null/— until real public CKE outputs are available.",
+    "runs": [
+      {
+        "id": "cke-3b-base",
+        "sort": 10,
+        "label": "3B base",
+        "model": "Qwen2.5 3B",
+        "stage": "base",
+        "status": "COMPLETED",
+        "overall_pct": 26.7,
+        "note": "Scored subset. Per-category public splits are not published yet.",
+        "source": "status.json placeholder awaiting public CKE output",
+        "categories": {
+          "text_open": null,
+          "text_closed": null,
+          "image_open": null,
+          "image_closed": null,
+          "essay": null
+        }
+      },
+      {
+        "id": "cke-3b-modal",
+        "sort": 20,
+        "label": "3B modal-v3",
+        "model": "Qwen2.5 3B",
+        "stage": "modal-v3",
+        "status": "COMPLETED",
+        "overall_pct": 17.1,
+        "note": "Per-category public splits are not published yet.",
+        "source": "status.json placeholder awaiting public CKE output",
+        "categories": {
+          "text_open": null,
+          "text_closed": null,
+          "image_open": null,
+          "image_closed": null,
+          "essay": null
+        }
+      },
+      {
+        "id": "cke-3b-history-v2",
+        "sort": 30,
+        "label": "3B history-v2",
+        "model": "Qwen2.5 3B",
+        "stage": "history-v2",
+        "status": "RUNNING",
+        "note": "Run active. Publish the five-way split when the eval artifact is public.",
+        "source": "status.json placeholder awaiting public CKE output",
+        "categories": {
+          "text_open": null,
+          "text_closed": null,
+          "image_open": null,
+          "image_closed": null,
+          "essay": null
+        }
+      },
+      {
+        "id": "cke-7b-base",
+        "sort": 40,
+        "label": "7B base",
+        "model": "Qwen2.5 7B",
+        "stage": "base",
+        "status": "COMPLETED",
+        "overall_pct": 37.1,
+        "note": "Scored subset. Per-category public splits are not published yet.",
+        "source": "status.json placeholder awaiting public CKE output",
+        "categories": {
+          "text_open": null,
+          "text_closed": null,
+          "image_open": null,
+          "image_closed": null,
+          "essay": null
+        }
+      },
+      {
+        "id": "cke-7b-fh",
+        "sort": 50,
+        "label": "7B fh",
+        "model": "Qwen2.5 7B",
+        "stage": "fh",
+        "status": "CANCEL_REQUESTED",
+        "note": "Illegal bf16 base under the 8.0/8.8 GB caps. No published category scores.",
+        "source": "status.json placeholder awaiting public CKE output",
+        "categories": {
+          "text_open": null,
+          "text_closed": null,
+          "image_open": null,
+          "image_closed": null,
+          "essay": null
+        }
+      },
+      {
+        "id": "cke-7b-fh-v2",
+        "sort": 60,
+        "label": "7B fh-v2",
+        "model": "Qwen2.5 7B",
+        "stage": "fh-v2",
+        "status": "CANCEL_REQUESTED",
+        "note": "Queued on an illegal bf16 base. No published category scores.",
+        "source": "status.json placeholder awaiting public CKE output",
+        "categories": {
+          "text_open": null,
+          "text_closed": null,
+          "image_open": null,
+          "image_closed": null,
+          "essay": null
+        }
+      }
+    ]
   },
   "jobs": [
     {
@@ -124,27 +246,27 @@
     "3b_history_v2": {
       "pct": 75.6,
       "n": "68/90",
-      "note": "contaminated \u2014 not matura"
+      "note": "contaminated — not matura"
     },
     "3b_modal_v3": {
       "pct": 94.4,
       "n": "85/90",
-      "note": "contaminated \u2014 not matura"
+      "note": "contaminated — not matura"
     },
     "7b_base": {
       "pct": 76.7,
       "n": "69/90",
-      "note": "COMPLETED \u2014 same 90-MCQ train set; not matura proof"
+      "note": "COMPLETED — same 90-MCQ train set; not matura proof"
     },
     "7b_fh": {
       "pct": 100.0,
       "n": "90/90",
-      "note": "COMPLETED \u2014 same 90-MCQ train set; not matura proof"
+      "note": "COMPLETED — same 90-MCQ train set; not matura proof"
     },
     "7b_fh_v2": {
       "pct": 98.9,
       "n": "89/90",
-      "note": "COMPLETED \u2014 same 90-MCQ train set; not matura proof"
+      "note": "COMPLETED — same 90-MCQ train set; not matura proof"
     },
     "7b_family": {
       "base_pct": 76.7,
@@ -161,7 +283,7 @@
     "max_base_disk_gb": 8.0,
     "max_after_ft_gb": 8.8,
     "exam": "fully offline Sunday",
-    "registration_base": "prefer Qwen2.5-3B (~6.18 GB); 7B only AWQ/GPTQ-Int4 \u22648.0 \u2014 NOT GPTQ-Int8 (8.875) or bf16",
+    "registration_base": "prefer Qwen2.5-3B (~6.18 GB); 7B only AWQ/GPTQ-Int4 ≤8.0 — NOT GPTQ-Int8 (8.875) or bf16",
     "matura_all": "512 items / 789 pts",
     "adapters_count_toward_after_ft": true,
     "cancel": "Bielik-11B bf16 / dapt-bielik / train-bielik / 7B bf16-as-base / GPTQ-Int8 as declared base",

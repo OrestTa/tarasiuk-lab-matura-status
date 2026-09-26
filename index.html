@@ -5,28 +5,56 @@
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <title>Tarasiuk Lab - Matura status</title>
 <style>
-  :root { --bg:#0b1020; --card:#141a2e; --text:#e8ecf7; --muted:#9aa3b8; --ok:#3dd68c; --run:#5b8cff; --warn:#f5a524; --bad:#f2555a; }
+  :root { --bg:#0b1020; --card:#141a2e; --text:#e8ecf7; --muted:#9aa3b8; --ok:#3dd68c; --run:#5b8cff; --warn:#f5a524; --bad:#f2555a; --border:#243055; --metric:#1a2342; }
   * { box-sizing: border-box; }
   body { margin:0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, sans-serif; background: radial-gradient(1200px 600px at 10% -10%, #1a2450, var(--bg)); color: var(--text); }
-  main { max-width: 960px; margin: 0 auto; padding: 28px 18px 64px; }
+  main { max-width: 1200px; margin: 0 auto; padding: 28px 18px 64px; }
   h1 { font-size: 1.6rem; margin: 0 0 6px; }
   .sub { color: var(--muted); margin-bottom: 22px; }
   .grid { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
-  .card { background: var(--card); border: 1px solid #243055; border-radius: 14px; padding: 16px 16px 12px; }
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 16px 16px 12px; }
   .card h2 { font-size: 1rem; margin: 0 0 10px; }
+  .section-title { display:flex; flex-wrap:wrap; gap:8px 14px; align-items:baseline; justify-content:space-between; margin-bottom:12px; }
+  .section-title p { margin:0; color:var(--muted); font-size:0.92rem; }
   ul { margin: 0; padding-left: 18px; color: #d5dbeb; }
   li { margin: 6px 0; }
   table { width: 100%; border-collapse: collapse; font-size: 0.92rem; }
-  th, td { text-align: left; padding: 8px 6px; border-bottom: 1px solid #243055; }
+  th, td { text-align: left; padding: 8px 6px; border-bottom: 1px solid var(--border); }
   th { color: var(--muted); font-weight: 600; }
   .pill { display:inline-block; padding: 2px 8px; border-radius: 999px; font-size: 0.75rem; font-weight: 700; letter-spacing: .02em; }
   .COMPLETED { background: rgba(61,214,140,.15); color: var(--ok); }
   .RUNNING { background: rgba(91,140,255,.15); color: var(--run); }
-  .BLOCKED, .PARKED { background: rgba(245,165,36,.15); color: var(--warn); }
-  .pct { font-variant-numeric: tabular-nums; font-weight: 700; }
+  .ACTIVE, .BLOCKED, .PARKED, .QUEUED { background: rgba(245,165,36,.15); color: var(--warn); }
+  .CANCELLED, .CANCEL_REQUESTED, .FAILED { background: rgba(242,85,90,.15); color: var(--bad); }
+  .pct, .mono { font-variant-numeric: tabular-nums; }
+  .pct { font-weight: 700; }
+  .run-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(250px, 1fr)); gap:14px; }
+  .run-card { background: rgba(255,255,255,0.02); border:1px solid var(--border); border-radius: 12px; padding: 14px; display:flex; flex-direction:column; gap:12px; }
+  .run-head { display:flex; align-items:flex-start; justify-content:space-between; gap:10px; }
+  .run-head h3 { margin:0; font-size:1rem; }
+  .run-head p { margin:4px 0 0; color:var(--muted); font-size:0.9rem; }
+  .run-overall { min-width: fit-content; text-align:right; }
+  .run-overall strong { display:block; font-size:1.2rem; }
+  .run-overall span { color:var(--muted); font-size:0.8rem; }
+  .metric-grid { display:grid; grid-template-columns:repeat(5, minmax(0, 1fr)); gap:8px; }
+  .metric { background: var(--metric); border-radius: 10px; padding: 10px 8px; min-height: 74px; }
+  .metric-name { display:block; color:var(--muted); font-size:0.75rem; line-height:1.2; text-transform:uppercase; letter-spacing:0.03em; }
+  .metric-value { display:block; margin-top:8px; font-size:1rem; font-weight:700; font-variant-numeric:tabular-nums; }
+  .metric-note { display:block; margin-top:4px; font-size:0.72rem; color:var(--muted); }
+  .run-note { margin:0; color:#d5dbeb; font-size:0.86rem; }
+  .run-source { margin:0; color:var(--muted); font-size:0.8rem; }
   a { color: #8eb6ff; }
   footer { margin-top: 22px; color: var(--muted); font-size: 0.85rem; }
   .error { color: #ffb4b8; }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+  @media (max-width: 860px) {
+    .metric-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+  @media (max-width: 520px) {
+    .metric-grid { grid-template-columns: 1fr; }
+    .run-head { flex-direction:column; }
+    .run-overall { text-align:left; }
+  }
 </style>
 </head>
 <body>
@@ -35,6 +63,14 @@
   <p class="sub">Warsaw Model Trainers - shared board for <strong>Matura Hack (Grok)</strong> + <strong>Claude</strong> - updated <span id="updated">...</span></p>
 
   <div class="grid" id="tracks"></div>
+
+  <div class="card" style="margin-top:14px">
+    <div class="section-title">
+      <h2>CKE breakdown by category</h2>
+      <p>Every published base run and improvement stage must show: text open, text closed, image open, image closed, essay.</p>
+    </div>
+    <div id="cke-runs" class="run-grid"></div>
+  </div>
 
   <div class="card" style="margin-top:14px">
     <h2>Jobs</h2>
@@ -51,44 +87,283 @@
     <ul id="links"></ul>
   </div>
 
-  <footer>No secrets, IPs, or keys on this page. Refresh by updating <code>status.json</code> and republishing this folder.</footer>
+  <footer>No secrets, IPs, or keys on this page. Refresh by updating <code>public_status.json</code> or <code>status.json</code>; optional <code>scores.json</code> can publish per-category CKE splits.</footer>
 </main>
 <script>
-async function main() {
-  const response = await fetch('./status.json', { cache: 'no-store' });
-  if (!response.ok) throw new Error(`status.json returned ${response.status}`);
-  const data = await response.json();
-  document.getElementById('updated').textContent = data.updated;
+const CATEGORY_ORDER = [
+  { id: 'text_open', label: 'text open' },
+  { id: 'text_closed', label: 'text closed' },
+  { id: 'image_open', label: 'image open' },
+  { id: 'image_closed', label: 'image closed' },
+  { id: 'essay', label: 'essay' },
+];
 
-  const tracks = document.getElementById('tracks');
-  for (const track of Object.values(data.tracks)) {
-    const el = document.createElement('div');
-    el.className = 'card';
-    el.innerHTML = `<h2>${track.role}</h2><ul>${track.highlights.map(h => `<li>${h}</li>`).join('')}</ul>`;
-    tracks.appendChild(el);
+const CATEGORY_ALIASES = {
+  text_open: ['text_open', 'text open', 'text-open', 'textOpen'],
+  text_closed: ['text_closed', 'text closed', 'text-closed', 'textClosed'],
+  image_open: ['image_open', 'image open', 'image-open', 'imageOpen'],
+  image_closed: ['image_closed', 'image closed', 'image-closed', 'imageClosed'],
+  essay: ['essay'],
+};
+
+function escapeHtml(value) {
+  return String(value ?? '')
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#39;');
+}
+
+function slugify(value) {
+  return String(value || '')
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '') || 'unknown';
+}
+
+async function fetchJson(path, { required = false } = {}) {
+  const response = await fetch(path, { cache: 'no-store' });
+  if (response.ok) return response.json();
+  if (!required && response.status === 404) return null;
+  throw new Error(`${path} returned ${response.status}`);
+}
+
+function pickCategoryMetric(source, categoryId) {
+  const aliases = CATEGORY_ALIASES[categoryId] || [categoryId];
+  for (const key of aliases) {
+    if (source && Object.prototype.hasOwnProperty.call(source, key)) return source[key];
+  }
+  return null;
+}
+
+function coercePct(value) {
+  if (typeof value === 'number' && Number.isFinite(value)) return value;
+  if (typeof value === 'string') {
+    const match = value.match(/-?\d+(?:\.\d+)?/);
+    if (match) return Number(match[0]);
+  }
+  return null;
+}
+
+function normalizeMetric(metric) {
+  if (metric == null) return { pct: null, n: '', note: '' };
+  if (typeof metric === 'number' || typeof metric === 'string') {
+    return { pct: coercePct(metric), n: '', note: '' };
+  }
+  return {
+    pct: coercePct(metric.pct ?? metric.percent ?? metric.score_pct ?? metric.score),
+    n: metric.n ?? metric.items ?? metric.count ?? '',
+    note: metric.note ?? '',
+  };
+}
+
+function normalizeRun(run = {}) {
+  const runCategories = run.categories ?? run.scores ?? {};
+  const metrics = Object.fromEntries(CATEGORY_ORDER.map((category) => [
+    category.id,
+    normalizeMetric(
+      pickCategoryMetric(runCategories, category.id) ??
+      pickCategoryMetric(run, category.id)
+    ),
+  ]));
+
+  const overall = normalizeMetric(run.overall ?? {
+    pct: run.overall_pct ?? run.pct,
+    n: run.overall_n ?? run.n,
+    note: run.overall_note,
+  });
+
+  const model = run.model ?? run.family ?? '';
+  const stage = run.stage ?? run.run ?? '';
+  return {
+    id: run.id ?? run.job_id ?? slugify(`${model}-${stage}-${run.label ?? ''}`),
+    label: run.label ?? ([model, stage].filter(Boolean).join(' ') || 'Unnamed run'),
+    model,
+    stage,
+    status: run.status ?? 'PENDING',
+    overall,
+    categories: metrics,
+    note: run.note ?? '',
+    source: run.source ?? '',
+    sort: Number.isFinite(run.sort) ? run.sort : 999,
+  };
+}
+
+function parseOverallFromDetail(detail) {
+  const match = String(detail || '').match(/(\d+(?:\.\d+)?)%/);
+  return match ? Number(match[1]) : null;
+}
+
+function deriveCkeRuns(data) {
+  return (data.jobs || [])
+    .filter((job) => /^cke-/i.test(job.id || '') || /^cke\b/i.test(job.name || ''))
+    .map((job, index) => {
+      const label = String(job.name || '').replace(/^CKE\s+/i, '') || job.id || `CKE run ${index + 1}`;
+      const parts = label.split(/\s+/);
+      const model = parts.shift() || '';
+      const stage = parts.join(' ') || 'run';
+      return normalizeRun({
+        id: job.id || slugify(label),
+        label,
+        model,
+        stage,
+        status: job.state,
+        overall_pct: parseOverallFromDetail(job.detail),
+        note: job.detail && !/%/.test(job.detail) ? job.detail : '',
+        source: 'derived from jobs[]',
+        sort: index,
+      });
+    });
+}
+
+function mergeRuns(...collections) {
+  const merged = new Map();
+  for (const collection of collections) {
+    for (const candidate of collection || []) {
+      const run = normalizeRun(candidate);
+      const existing = merged.get(run.id);
+      if (!existing) {
+        merged.set(run.id, run);
+        continue;
+      }
+      const categories = { ...existing.categories };
+      for (const category of CATEGORY_ORDER) {
+        const nextMetric = run.categories[category.id];
+        if (nextMetric && (nextMetric.pct != null || nextMetric.n || nextMetric.note)) {
+          categories[category.id] = nextMetric;
+        }
+      }
+      merged.set(run.id, {
+        ...existing,
+        ...run,
+        label: run.label || existing.label,
+        model: run.model || existing.model,
+        stage: run.stage || existing.stage,
+        status: run.status || existing.status,
+        overall: run.overall.pct != null || run.overall.n || run.overall.note ? run.overall : existing.overall,
+        note: run.note || existing.note,
+        source: run.source || existing.source,
+        categories,
+        sort: Math.min(existing.sort, run.sort),
+      });
+    }
+  }
+  return [...merged.values()].sort((left, right) => left.sort - right.sort || left.label.localeCompare(right.label));
+}
+
+function extractConfiguredRuns(data) {
+  if (!data) return [];
+  if (Array.isArray(data.cke_runs)) return data.cke_runs;
+  if (data.cke && Array.isArray(data.cke.runs)) return data.cke.runs;
+  if (Array.isArray(data.runs)) return data.runs;
+  return [];
+}
+
+function metricDisplay(metric) {
+  const pct = metric.pct != null ? `${metric.pct}%` : '—';
+  const suffix = metric.n ? ` (${metric.n})` : '';
+  return `${pct}${suffix}`;
+}
+
+function renderCkeRuns(runs) {
+  const container = document.getElementById('cke-runs');
+  if (!runs.length) {
+    container.innerHTML = `<div class="run-card"><p class="run-note">No CKE runs have been published yet.</p></div>`;
+    return;
   }
 
-  document.getElementById('jobs').innerHTML = data.jobs.map(job =>
-    `<tr><td>${job.name}</td><td><span class="pill ${job.state}">${job.state}</span></td><td>${job.detail || ''}</td></tr>`
-  ).join('');
+  container.innerHTML = runs.map((run) => {
+    const metrics = CATEGORY_ORDER.map((category) => {
+      const metric = run.categories[category.id];
+      return `
+        <div class="metric">
+          <span class="metric-name">${escapeHtml(category.label)}</span>
+          <span class="metric-value">${escapeHtml(metricDisplay(metric))}</span>
+          ${metric.note ? `<span class="metric-note">${escapeHtml(metric.note)}</span>` : ''}
+        </div>`;
+    }).join('');
 
-  document.getElementById('mcq').innerHTML = Object.entries(data.mcq).map(([name, value]) =>
-    `<tr><td>${name}</td><td class="pct">${value.pct != null ? `${value.pct}% (${value.n})` : 'pending'}</td><td>${value.note || ''}</td></tr>`
-  ).join('');
+    const overall = run.overall.pct != null ? `${run.overall.pct}%${run.overall.n ? ` (${run.overall.n})` : ''}` : '—';
+    return `
+      <article class="run-card">
+        <div class="run-head">
+          <div>
+            <h3>${escapeHtml(run.label)}</h3>
+            <p>${escapeHtml(run.model || 'Unknown model')}${run.stage ? ` - ${escapeHtml(run.stage)}` : ''}</p>
+          </div>
+          <div class="run-overall">
+            <strong class="mono">${escapeHtml(overall)}</strong>
+            <span>overall</span>
+          </div>
+        </div>
+        <div>
+          <span class="pill ${escapeHtml(run.status)}">${escapeHtml(run.status)}</span>
+        </div>
+        <div class="metric-grid">${metrics}</div>
+        ${run.note ? `<p class="run-note">${escapeHtml(run.note)}</p>` : ''}
+        ${run.source ? `<p class="run-source">Source: ${escapeHtml(run.source)}</p>` : ''}
+      </article>`;
+  }).join('');
+}
 
-  const links = data.links;
-  const constraints = data.constraints;
+function renderTracks(data) {
+  const tracks = document.getElementById('tracks');
+  tracks.innerHTML = '';
+  for (const track of Object.values(data.tracks || {})) {
+    const el = document.createElement('div');
+    el.className = 'card';
+    el.innerHTML = `<h2>${escapeHtml(track.role)}</h2><ul>${(track.highlights || []).map((highlight) => `<li>${escapeHtml(highlight)}</li>`).join('')}</ul>`;
+    tracks.appendChild(el);
+  }
+}
+
+function renderJobs(data) {
+  document.getElementById('jobs').innerHTML = (data.jobs || []).map((job) =>
+    `<tr><td>${escapeHtml(job.name)}</td><td><span class="pill ${escapeHtml(job.state)}">${escapeHtml(job.state)}</span></td><td>${escapeHtml(job.detail || '')}</td></tr>`
+  ).join('');
+}
+
+function renderMcq(data) {
+  document.getElementById('mcq').innerHTML = Object.entries(data.mcq || {}).map(([name, value]) =>
+    `<tr><td>${escapeHtml(name)}</td><td class="pct">${value.pct != null ? `${escapeHtml(value.pct)}% (${escapeHtml(value.n)})` : 'pending'}</td><td>${escapeHtml(value.note || '')}</td></tr>`
+  ).join('');
+}
+
+function renderLinks(data) {
+  const links = data.links || {};
+  const constraints = data.constraints || {};
   document.getElementById('links').innerHTML = `
-    <li>Base disk cap: <strong>${constraints.max_base_disk_gb} GB</strong> (LoRA excluded) - registered base: ${constraints.registration_base}</li>
-    <li>Exam: ${constraints.exam}</li>
-    <li><a href="${links.leaderboard}">Practice leaderboard</a></li>
-    <li><a href="${links.repo}">Private working repo</a></li>
-    <li><a href="${links.audit_issue}">COMMIT_AUDIT issue #6</a> (collaborators only)</li>
+    <li>Base disk cap: <strong>${escapeHtml(constraints.max_base_disk_gb)} GB</strong>; after fine-tune cap: <strong>${escapeHtml(constraints.max_after_ft_gb)} GB</strong>; registered base: ${escapeHtml(constraints.registration_base || '')}</li>
+    <li>Exam: ${escapeHtml(constraints.exam || '')}</li>
+    <li><a href="${escapeHtml(links.leaderboard || '#')}">Practice leaderboard</a></li>
+    <li><a href="${escapeHtml(links.repo || '#')}">Private working repo</a></li>
+    <li><a href="${escapeHtml(links.audit_issue || '#')}">COMMIT_AUDIT issue #6</a> (collaborators only)</li>
   `;
 }
 
+async function main() {
+  const publicStatus = await fetchJson('./public_status.json');
+  const status = publicStatus || await fetchJson('./status.json', { required: true });
+  const scoreData = await fetchJson('./scores.json');
+
+  document.getElementById('updated').textContent = status.updated;
+
+  renderTracks(status);
+  renderJobs(status);
+  renderMcq(status);
+  renderLinks(status);
+
+  const configuredRuns = extractConfiguredRuns(status);
+  const publicRuns = extractConfiguredRuns(publicStatus);
+  const scoreRuns = extractConfiguredRuns(scoreData);
+  const derivedRuns = deriveCkeRuns(status);
+  renderCkeRuns(mergeRuns(derivedRuns, configuredRuns, publicRuns, scoreRuns));
+}
+
 main().catch((error) => {
-  document.getElementById('tracks').innerHTML = `<div class="card error"><h2>Board failed to load</h2><p>${error.message}</p></div>`;
+  document.getElementById('tracks').innerHTML = `<div class="card error"><h2>Board failed to load</h2><p>${escapeHtml(error.message)}</p></div>`;
 });
 </script>
 </body>
