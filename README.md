@@ -70,3 +70,26 @@ If you have per-item result JSON, a stage can also point at it:
 ```
 
 The board will try to recompute `text_open`, `text_closed`, `image_open`, `image_closed`, `essay`, and `overall_pct` from that result file when possible.
+
+## Prize-track tabs
+
+The page also supports a top-level `prize_tracks` array in `status.json` to drive the three board tabs. Example:
+
+```json
+{
+  "prize_tracks": [
+    {
+      "id": "best-matura-score",
+      "title": "Best matura score",
+      "goal": "Highest honest Sunday exam score.",
+      "status": "RUNNING",
+      "summary": "Current leader and blockers.",
+      "sections": [
+        { "title": "Baselines (honest bare)", "stage_ids": ["cke-3b-base"] },
+        { "title": "Interim results", "stage_ids": ["cke-3b-history-v2"] },
+        { "title": "Best post-training / improvement stages", "stage_ids": ["cke-3b-modal"] }
+      ]
+    }
+  ]
+}
+```

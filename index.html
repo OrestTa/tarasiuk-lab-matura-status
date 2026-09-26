@@ -32,11 +32,21 @@
   .table-wrap { overflow-x: auto; }
   .cke-table { min-width: 980px; }
   .cke-table th:nth-child(n+4),
-  .cke-table td:nth-child(n+4):nth-child(-n+8) { text-align: center; }
+  .cke-table td:nth-child(n+4):nth-child(-n+9) { text-align: center; }
   .stage-name { font-weight: 700; }
   .stage-meta { display:block; margin-top:4px; color:var(--muted); font-size:0.82rem; }
   .stage-note { color:#d5dbeb; }
   .stage-source { display:block; margin-top:4px; color:var(--muted); font-size:0.78rem; }
+  .tabs { display:flex; flex-wrap:wrap; gap:10px; margin-bottom:16px; }
+  .tab-btn { appearance:none; border:1px solid var(--border); background:rgba(255,255,255,0.02); color:var(--text); border-radius:999px; padding:10px 14px; font:inherit; font-weight:700; cursor:pointer; }
+  .tab-btn.active { background:rgba(91,140,255,.18); border-color:#5b8cff; color:#dce7ff; }
+  .tab-panel { display:none; gap:14px; }
+  .tab-panel.active { display:grid; }
+  .track-summary { padding-bottom:16px; }
+  .track-summary h3, .section-block h3 { margin:0; font-size:1rem; }
+  .track-summary p { margin:8px 0 0; }
+  .section-block { display:grid; gap:10px; }
+  .empty-cell { color:var(--muted); }
   a { color: #8eb6ff; }
   footer { margin-top: 22px; color: var(--muted); font-size: 0.85rem; }
   .error { color: #ffb4b8; }
@@ -52,27 +62,11 @@
 
   <div class="card" style="margin-top:14px">
     <div class="section-title">
-      <h2>CKE breakdown by category</h2>
-      <p>Every published base run and improvement stage must always show the five required board columns: text open, text closed, image open, image closed, essay.</p>
+      <h2>Prize-track board</h2>
+      <p>Each tab shows track goal/status, honest bare baselines, interim results, and the best improvement stages with the same five public CKE columns.</p>
     </div>
-    <div class="table-wrap">
-      <table class="cke-table">
-        <thead>
-          <tr>
-            <th>stage</th>
-            <th>status</th>
-            <th>overall</th>
-            <th>text open</th>
-            <th>text closed</th>
-            <th>image open</th>
-            <th>image closed</th>
-            <th>essay</th>
-            <th>note</th>
-          </tr>
-        </thead>
-        <tbody id="cke-stages"></tbody>
-      </table>
-    </div>
+    <div id="track-tabs" class="tabs" role="tablist"></div>
+    <div id="track-panels"></div>
   </div>
 
   <div class="card" style="margin-top:14px">
@@ -188,6 +182,9 @@ function normalizeStage(stage = {}) {
     status: stage.status ?? 'PENDING',
     overall,
     metrics,
+    baseStageId: stage.base_stage_id ?? stage.baseStageId ?? '',
+    honestBare: Boolean(stage.honest_bare ?? stage.honestBare),
+    deltaPct: coercePct(stage.delta_vs_base_pct ?? stage.deltaPct),
     note: stage.note ?? '',
     source: stage.source ?? '',
     byCategory: stage.by_category ?? stage.byCategory ?? null,
@@ -252,6 +249,9 @@ function mergeStages(...collections) {
         note: stage.note || existing.note,
         source: stage.source || existing.source,
         metrics,
+        baseStageId: stage.baseStageId || existing.baseStageId,
+        honestBare: stage.honestBare || existing.honestBare,
+        deltaPct: stage.deltaPct ?? existing.deltaPct,
         byCategory: stage.byCategory || existing.byCategory,
         inlineResults: stage.inlineResults || existing.inlineResults,
         resultsPath: stage.resultsPath || existing.resultsPath,
@@ -269,6 +269,10 @@ function extractConfiguredStages(data) {
   if (data.cke && Array.isArray(data.cke.runs)) return data.cke.runs;
   if (Array.isArray(data.runs)) return data.runs;
   return [];
+}
+
+function extractPrizeTracks(data) {
+  return Array.isArray(data?.prize_tracks) ? data.prize_tracks : [];
 }
 
 function metricDisplay(metric) {
@@ -444,14 +448,32 @@ async function hydrateStages(stageCandidates) {
   }));
 }
 
-function renderStageTable(stages) {
-  const tbody = document.getElementById('cke-stages');
+function withDerivedDeltas(stages) {
+  const lookup = new Map(stages.map((stage) => [stage.id, stage]));
+  return stages.map((stage) => {
+    if (stage.deltaPct != null) return stage;
+    if (stage.honestBare) return { ...stage, deltaPct: 0 };
+    const base = stage.baseStageId ? lookup.get(stage.baseStageId) : null;
+    if (base && stage.overall.pct != null && base.overall.pct != null) {
+      return { ...stage, deltaPct: roundPct(stage.overall.pct - base.overall.pct) };
+    }
+    return stage;
+  });
+}
+
+function deltaDisplay(stage) {
+  if (stage.honestBare && stage.deltaPct === 0) return 'base';
+  if (stage.deltaPct == null) return '—';
+  const sign = stage.deltaPct > 0 ? '+' : '';
+  return `${sign}${stage.deltaPct}%`;
+}
+
+function stageRowsMarkup(stages) {
   if (!stages.length) {
-    tbody.innerHTML = `<tr><td colspan="9" class="stage-note">No CKE stages have been published yet.</td></tr>`;
-    return;
+    return `<tr><td colspan="10" class="empty-cell">No published stages for this section yet.</td></tr>`;
   }
 
-  tbody.innerHTML = stages.map((stage) => {
+  return stages.map((stage) => {
     const cells = CATEGORY_ORDER.map((category) => {
       const metric = stage.metrics[category.id];
       const title = metric.note ? ` title="${escapeHtml(metric.note)}"` : '';
@@ -466,10 +488,98 @@ function renderStageTable(stages) {
         </td>
         <td><span class="pill ${escapeHtml(stage.status)}">${escapeHtml(stage.status)}</span></td>
         <td class="pct">${escapeHtml(overall)}</td>
+        <td class="pct">${escapeHtml(deltaDisplay(stage))}</td>
         ${cells}
         <td class="stage-note">${escapeHtml(stage.note || '')}${stage.source ? `<span class="stage-source">Source: ${escapeHtml(stage.source)}</span>` : ''}</td>
       </tr>`;
   }).join('');
+}
+
+function stageTableMarkup(stages) {
+  return `
+    <div class="table-wrap">
+      <table class="cke-table">
+        <thead>
+          <tr>
+            <th>stage</th>
+            <th>status</th>
+            <th>overall</th>
+            <th>delta vs base</th>
+            <th>text open</th>
+            <th>text closed</th>
+            <th>image open</th>
+            <th>image closed</th>
+            <th>essay</th>
+            <th>note</th>
+          </tr>
+        </thead>
+        <tbody>${stageRowsMarkup(stages)}</tbody>
+      </table>
+    </div>`;
+}
+
+function renderPrizeTracks(trackConfig, stages) {
+  const tabs = document.getElementById('track-tabs');
+  const panels = document.getElementById('track-panels');
+  const stageLookup = new Map(stages.map((stage) => [stage.id, stage]));
+
+  if (!trackConfig.length) {
+    tabs.innerHTML = '';
+    panels.innerHTML = stageTableMarkup(stages);
+    return;
+  }
+
+  tabs.innerHTML = trackConfig.map((track, index) => `
+    <button
+      type="button"
+      class="tab-btn${index === 0 ? ' active' : ''}"
+      data-track-tab="${escapeHtml(track.id)}"
+      role="tab"
+      aria-selected="${index === 0 ? 'true' : 'false'}"
+    >${escapeHtml(track.title)}</button>
+  `).join('');
+
+  panels.innerHTML = trackConfig.map((track, index) => {
+    const sections = (track.sections || []).map((section) => {
+      const sectionStages = (section.stage_ids || []).map((id) => stageLookup.get(id)).filter(Boolean);
+      return `
+        <div class="card section-block">
+          <h3>${escapeHtml(section.title)}</h3>
+          ${stageTableMarkup(sectionStages)}
+        </div>`;
+    }).join('');
+
+    return `
+      <section class="tab-panel${index === 0 ? ' active' : ''}" data-track-panel="${escapeHtml(track.id)}">
+        <div class="card track-summary">
+          <div class="section-title">
+            <h3>${escapeHtml(track.title)}</h3>
+            <span class="pill ${escapeHtml(track.status || 'ACTIVE')}">${escapeHtml(track.status || 'ACTIVE')}</span>
+          </div>
+          <p><strong>Goal:</strong> ${escapeHtml(track.goal || '')}</p>
+          ${track.summary ? `<p class="dim">${escapeHtml(track.summary)}</p>` : ''}
+        </div>
+        ${sections}
+      </section>`;
+  }).join('');
+
+  if (typeof document.querySelectorAll !== 'function') return;
+
+  const buttons = [...document.querySelectorAll('[data-track-tab]')];
+  const tabPanels = [...document.querySelectorAll('[data-track-panel]')];
+  for (const button of buttons) {
+    button.addEventListener('click', () => {
+      const target = button.getAttribute('data-track-tab');
+      for (const other of buttons) {
+        const active = other === button;
+        other.classList.toggle('active', active);
+        other.setAttribute('aria-selected', active ? 'true' : 'false');
+      }
+      for (const panel of tabPanels) {
+        panel.classList.toggle('active', panel.getAttribute('data-track-panel') === target);
+      }
+    });
+  }
 }
 
 function renderTracks(data) {
@@ -523,7 +633,8 @@ async function main() {
   const publicStages = extractConfiguredStages(publicStatus);
   const scoreStages = extractConfiguredStages(scoreData);
   const derivedStages = deriveStages(status);
-  renderStageTable(await hydrateStages(mergeStages(derivedStages, configuredStages, publicStages, scoreStages)));
+  const hydratedStages = withDerivedDeltas(await hydrateStages(mergeStages(derivedStages, configuredStages, publicStages, scoreStages)));
+  renderPrizeTracks(extractPrizeTracks(status), hydratedStages);
 }
 
 main().catch((error) => {

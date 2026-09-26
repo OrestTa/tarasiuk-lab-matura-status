@@ -34,6 +34,7 @@
       "model": "Qwen2.5 3B",
       "stage": "base",
       "status": "COMPLETED",
+      "honest_bare": true,
       "overall_pct": 26.7,
       "text_open": null,
       "text_closed": null,
@@ -50,6 +51,7 @@
       "model": "Qwen2.5 3B",
       "stage": "modal-v3",
       "status": "COMPLETED",
+      "base_stage_id": "cke-3b-base",
       "overall_pct": 17.1,
       "text_open": null,
       "text_closed": null,
@@ -66,6 +68,7 @@
       "model": "Qwen2.5 3B",
       "stage": "history-v2",
       "status": "RUNNING",
+      "base_stage_id": "cke-3b-base",
       "text_open": null,
       "text_closed": null,
       "image_open": null,
@@ -81,6 +84,7 @@
       "model": "Qwen2.5 7B",
       "stage": "base",
       "status": "COMPLETED",
+      "honest_bare": true,
       "overall_pct": 37.1,
       "text_open": null,
       "text_closed": null,
@@ -97,6 +101,7 @@
       "model": "Qwen2.5 7B",
       "stage": "fh",
       "status": "CANCEL_REQUESTED",
+      "base_stage_id": "cke-7b-base",
       "text_open": null,
       "text_closed": null,
       "image_open": null,
@@ -112,6 +117,7 @@
       "model": "Qwen2.5 7B",
       "stage": "fh-v2",
       "status": "CANCEL_REQUESTED",
+      "base_stage_id": "cke-7b-base",
       "text_open": null,
       "text_closed": null,
       "image_open": null,
@@ -119,6 +125,71 @@
       "essay": null,
       "note": "Queued on an illegal bf16 base. No published category scores.",
       "source": "status.json placeholder awaiting public CKE output"
+    }
+  ],
+  "prize_tracks": [
+    {
+      "id": "best-matura-score",
+      "title": "Best matura score",
+      "goal": "Highest honest Sunday exam score under the 8.0 GB base / 8.8 GB after-FT caps.",
+      "status": "RUNNING",
+      "summary": "7B base is the current public honest leader at 37.1%; tuned successors still need valid public eval outputs.",
+      "sections": [
+        {
+          "title": "Baselines (honest bare)",
+          "stage_ids": ["cke-3b-base", "cke-7b-base"]
+        },
+        {
+          "title": "Interim results",
+          "stage_ids": ["cke-3b-history-v2"]
+        },
+        {
+          "title": "Best post-training / improvement stages",
+          "stage_ids": ["cke-3b-modal", "cke-7b-fh", "cke-7b-fh-v2"]
+        }
+      ]
+    },
+    {
+      "id": "best-progress",
+      "title": "Best progress",
+      "goal": "Largest tuned minus honest bare-base improvement on the Sunday exam.",
+      "status": "RUNNING",
+      "summary": "Publicly scored tuned runs do not yet beat their honest bare bases; pending runs are still in flight or invalidated by cap violations.",
+      "sections": [
+        {
+          "title": "Baselines (honest bare)",
+          "stage_ids": ["cke-3b-base", "cke-7b-base"]
+        },
+        {
+          "title": "Interim results",
+          "stage_ids": ["cke-3b-history-v2"]
+        },
+        {
+          "title": "Best post-training / improvement stages",
+          "stage_ids": ["cke-3b-modal", "cke-7b-fh", "cke-7b-fh-v2"]
+        }
+      ]
+    },
+    {
+      "id": "maly-ale-wariat",
+      "title": "Mały ale wariat",
+      "goal": "Smallest model that still reaches at least 35% on the honest Sunday exam.",
+      "status": "BLOCKED",
+      "summary": "No ≤3B public run has cleared 35% yet; 3B history-v2 is the main pending attempt while 7B base is the current qualifying benchmark at 37.1%.",
+      "sections": [
+        {
+          "title": "Baselines (honest bare)",
+          "stage_ids": ["cke-3b-base", "cke-7b-base"]
+        },
+        {
+          "title": "Interim results",
+          "stage_ids": ["cke-3b-history-v2"]
+        },
+        {
+          "title": "Best post-training / improvement stages",
+          "stage_ids": ["cke-3b-modal"]
+        }
+      ]
     }
   ],
   "jobs": [
