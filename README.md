@@ -99,3 +99,10 @@ The page also supports a top-level `prize_tracks` array in `status.json` to driv
   ]
 }
 ```
+
+## History Ext Multi-Year
+
+Multi-year corpus work tracks Formula 2023 May history papers for 2023–2026 in `data/history_extended/formulka-2023/`.
+The first pack conversion target is `history-2024-05`, producing `exam.json`, cropped images, and `answers-template.json`.
+`history-2023-mock-v1` remains the only submission-quality gauge; the wider corpus adds coverage but does not replace that benchmark.
+Formula 2015 stays deferred, and this conversion work does not need L40S capacity yet.

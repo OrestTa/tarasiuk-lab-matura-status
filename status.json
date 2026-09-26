@@ -1,13 +1,13 @@
 {
-  "updated": "2026-09-26T15:22:25+02:00",
+  "updated": "2026-09-26T15:40:13+02:00",
   "team": "Tarasiuk Lab",
-  "hackathon": "Warsaw Model Trainers — Polish history matura",
+  "hackathon": "Warsaw Model Trainers \u2014 Polish history matura",
   "tracks": {
     "matura_hack_grok": {
       "role": "Matura Hack (Grok Bot)",
       "highlights": [
         "Headline CKE on matura.jsonl: 7B AWQ base 37.6% (best legal so far)",
-        "Size caps: base ≤8.0 GB, after FT ≤8.8 GB; GPTQ-Int8 and 11B Sunday bases are out",
+        "Size caps: base \u22648.0 GB, after FT \u22648.8 GB; GPTQ-Int8 and 11B Sunday bases are out",
         "3B line: base 26.7%, history-v2 28.3%, modal-v3 17.1%",
         "Current shared GPU story: current Forgehand L40S plus completed AWQ / Modal result passes"
       ]
@@ -17,8 +17,17 @@
       "highlights": [
         "Sunday quality path: declare 7B AWQ if registration can still be updated; otherwise keep 3B honest",
         "Never use bf16-7B, GPTQ-Int8 8.875, or Bielik-11B as the Sunday base",
-        "Headline remains the committed CKE May 23–26 eval, not the 90-question MCQ dev set",
+        "Headline remains the committed CKE May 23\u201326 eval, not the 90-question MCQ dev set",
         "Shared notes should say only current Forgehand L40S and should never carry IPs, SSH keys, or secrets"
+      ]
+    },
+    "history_ext_multi_year": {
+      "role": "History Ext Multi-Year",
+      "highlights": [
+        "Formu\u0142a 2023 maj papers 2023\u20132026 PDFs local; converting to official pack format (exam.json + images + answers-template)",
+        "Official mock history-2023-mock-v1 remains the ONLY submission-quality gauge",
+        "Layout: data/history_extended/formulka-2023/history-YYYY-05/; first convert history-2024-05",
+        "No L40S needed yet for conversion; Formu\u0142a 2015 deferred"
       ]
     }
   },
@@ -134,15 +143,24 @@
       "sections": [
         {
           "title": "Baselines (honest bare)",
-          "stage_ids": ["cke-3b-base", "cke-7b-awq-base"]
+          "stage_ids": [
+            "cke-3b-base",
+            "cke-7b-awq-base"
+          ]
         },
         {
           "title": "Interim results",
-          "stage_ids": ["cke-3b-history-v2"]
+          "stage_ids": [
+            "cke-3b-history-v2"
+          ]
         },
         {
           "title": "Best post-training / improvement stages",
-          "stage_ids": ["cke-3b-modal", "cke-7b-fh", "cke-7b-fh-v2"]
+          "stage_ids": [
+            "cke-3b-modal",
+            "cke-7b-fh",
+            "cke-7b-fh-v2"
+          ]
         }
       ]
     },
@@ -155,36 +173,52 @@
       "sections": [
         {
           "title": "Baselines (honest bare)",
-          "stage_ids": ["cke-3b-base", "cke-7b-awq-base"]
+          "stage_ids": [
+            "cke-3b-base",
+            "cke-7b-awq-base"
+          ]
         },
         {
           "title": "Interim results",
-          "stage_ids": ["cke-3b-history-v2"]
+          "stage_ids": [
+            "cke-3b-history-v2"
+          ]
         },
         {
           "title": "Best post-training / improvement stages",
-          "stage_ids": ["cke-3b-modal", "cke-7b-fh", "cke-7b-fh-v2"]
+          "stage_ids": [
+            "cke-3b-modal",
+            "cke-7b-fh",
+            "cke-7b-fh-v2"
+          ]
         }
       ]
     },
     {
       "id": "maly-ale-wariat",
-      "title": "Mały ale wariat",
+      "title": "Ma\u0142y ale wariat",
       "goal": "Smallest model that still reaches at least 35% on the honest Sunday exam.",
       "status": "BLOCKED",
-      "summary": "No ≤3B public run has cleared 35% yet; 3B history-v2 reached 28.3%, while 7B AWQ is the current qualifying benchmark at 37.6%.",
+      "summary": "No \u22643B public run has cleared 35% yet; 3B history-v2 reached 28.3%, while 7B AWQ is the current qualifying benchmark at 37.6%.",
       "sections": [
         {
           "title": "Baselines (honest bare)",
-          "stage_ids": ["cke-3b-base", "cke-7b-awq-base"]
+          "stage_ids": [
+            "cke-3b-base",
+            "cke-7b-awq-base"
+          ]
         },
         {
           "title": "Interim results",
-          "stage_ids": ["cke-3b-history-v2"]
+          "stage_ids": [
+            "cke-3b-history-v2"
+          ]
         },
         {
           "title": "Best post-training / improvement stages",
-          "stage_ids": ["cke-3b-modal"]
+          "stage_ids": [
+            "cke-3b-modal"
+          ]
         }
       ]
     }
@@ -231,6 +265,12 @@
       "name": "Bielik-11B lanes",
       "state": "PARKED",
       "detail": "cancel_requested; illegal Sunday base"
+    },
+    {
+      "id": "history-ext-pack-conversion",
+      "name": "History Ext multi-year pack conversion",
+      "state": "RUNNING",
+      "detail": "Formu\u0142a 2023 -> official pack format; history-2024-05 first"
     }
   ],
   "mcq": {
@@ -249,12 +289,12 @@
     "3b_history_v2": {
       "pct": 75.6,
       "n": "68/90",
-      "note": "contaminated — not matura"
+      "note": "contaminated \u2014 not matura"
     },
     "3b_modal_v3": {
       "pct": 94.4,
       "n": "85/90",
-      "note": "contaminated — not headline evidence"
+      "note": "contaminated \u2014 not headline evidence"
     },
     "7b_base": {
       "pct": 76.7,
@@ -264,12 +304,12 @@
     "7b_fh": {
       "pct": 100.0,
       "n": "90/90",
-      "note": "contaminated — same 90-MCQ train set"
+      "note": "contaminated \u2014 same 90-MCQ train set"
     },
     "7b_fh_v2": {
       "pct": 98.9,
       "n": "89/90",
-      "note": "contaminated — same 90-MCQ train set"
+      "note": "contaminated \u2014 same 90-MCQ train set"
     },
     "7b_family": {
       "base_pct": 76.7,
