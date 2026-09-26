@@ -1,5 +1,5 @@
 {
-  "updated": "2026-09-26T15:22:25+02:00",
+  "updated": "2026-09-26T15:40:20+02:00",
   "stages": [
     {
       "id": "cke-3b-base",
@@ -15,29 +15,12 @@
       "image_open": null,
       "image_closed": null,
       "essay": null,
-      "note": "Scored subset. Per-category public splits are not published yet.",
-      "source": "scores.json placeholder awaiting public CKE output"
-    },
-    {
-      "id": "cke-3b-modal",
-      "sort": 20,
-      "name": "3B modal-v3",
-      "model": "Qwen2.5 3B",
-      "stage": "modal-v3",
-      "status": "COMPLETED",
-      "base_stage_id": "cke-3b-base",
-      "overall_pct": 17.1,
-      "text_open": null,
-      "text_closed": null,
-      "image_open": null,
-      "image_closed": null,
-      "essay": null,
-      "note": "Per-category public splits are not published yet.",
-      "source": "scores.json placeholder awaiting public CKE output"
+      "note": "Legal honest baseline; per-category public splits are not published yet.",
+      "source": "notes/TRACK01_BEST_SCORE.md"
     },
     {
       "id": "cke-3b-history-v2",
-      "sort": 30,
+      "sort": 20,
       "name": "3B history-v2",
       "model": "Qwen2.5 3B",
       "stage": "history-v2",
@@ -49,8 +32,25 @@
       "image_open": null,
       "image_closed": null,
       "essay": null,
-      "note": "Scored subset. Per-category public splits are not published yet.",
-      "source": "scores.json placeholder awaiting public CKE output"
+      "note": "Small public CKE lift over the 3B base.",
+      "source": "notes/TRACK01_BEST_SCORE.md"
+    },
+    {
+      "id": "cke-3b-modal",
+      "sort": 30,
+      "name": "3B modal-v3",
+      "model": "Qwen2.5 3B",
+      "stage": "modal-v3",
+      "status": "COMPLETED",
+      "base_stage_id": "cke-3b-base",
+      "overall_pct": 17.1,
+      "text_open": null,
+      "text_closed": null,
+      "image_open": null,
+      "image_closed": null,
+      "essay": null,
+      "note": "Completed legal tuned pass, but it regresses versus the 3B base.",
+      "source": "notes/TRACK01_BEST_SCORE.md"
     },
     {
       "id": "cke-7b-awq-base",
@@ -66,40 +66,25 @@
       "image_open": null,
       "image_closed": null,
       "essay": null,
-      "note": "Scored 60/154; text-only 38.9%. Per-category public splits are not published yet.",
-      "source": "scores.json placeholder awaiting public CKE output"
+      "note": "Best legal baseline so far; measured pack about 5.582 GB.",
+      "source": "notes/TRACK01_BEST_SCORE.md"
     },
     {
-      "id": "cke-7b-fh",
+      "id": "cke-7b-awq-fh-offline",
       "sort": 50,
-      "name": "7B fh (bf16 lane)",
-      "model": "Qwen2.5 7B",
-      "stage": "fh",
-      "status": "BLOCKED",
+      "name": "7B AWQ + fh LoRA (offline)",
+      "model": "Qwen2.5 7B AWQ",
+      "stage": "fh-offline",
+      "status": "COMPLETED",
       "base_stage_id": "cke-7b-awq-base",
+      "overall_pct": 29.8,
       "text_open": null,
       "text_closed": null,
       "image_open": null,
       "image_closed": null,
       "essay": null,
-      "note": "Illegal bf16 base under the 8.0/8.8 GB caps. No published category scores.",
-      "source": "scores.json placeholder awaiting public CKE output"
-    },
-    {
-      "id": "cke-7b-fh-v2",
-      "sort": 60,
-      "name": "7B fh-v2",
-      "model": "Qwen2.5 7B",
-      "stage": "fh-v2",
-      "status": "BLOCKED",
-      "base_stage_id": "cke-7b-awq-base",
-      "text_open": null,
-      "text_closed": null,
-      "image_open": null,
-      "image_closed": null,
-      "essay": null,
-      "note": "Queued on an illegal bf16 base. No published category scores.",
-      "source": "scores.json placeholder awaiting public CKE output"
+      "note": "Legal run, but it regresses versus the bare AWQ base; demoted from the Sunday pack.",
+      "source": "notes/TRACK01_BEST_SCORE.md"
     }
   ]
 }

@@ -1,33 +1,24 @@
 {
-  "updated": "2026-09-26T15:40:30+02:00",
+  "updated": "2026-09-26T15:40:20+02:00",
   "team": "Tarasiuk Lab",
   "hackathon": "Warsaw Model Trainers — Polish history matura",
   "tracks": {
     "matura_hack_grok": {
       "role": "Matura Hack (Grok Bot)",
       "highlights": [
-        "Headline CKE on matura.jsonl: 7B AWQ base 37.6% (best legal so far)",
-        "Size caps: base ≤8.0 GB, after FT ≤8.8 GB; GPTQ-Int8 and 11B Sunday bases are out",
-        "3B line: base 26.7%, history-v2 28.3%, modal-v3 17.1%",
-        "Current shared GPU story: current Forgehand L40S plus completed AWQ / Modal result passes"
+        "Bare Qwen2.5-7B-Instruct-AWQ stays the best legal CKE lane: 37.6% full / 38.9% text-only.",
+        "Measured AWQ pack is about 5.582 GB, inside the 8.0 GB base and 8.8 GB after-FT caps.",
+        "AWQ + forgehand fh LoRA (offline) scored 29.8% full / 32.1% text-only and is demoted from the Sunday path.",
+        "No secrets, keys, or private IPs are carried in the public refresh payload."
       ]
     },
     "claude": {
       "role": "Claude Opus on trunk",
       "highlights": [
-        "Sunday quality path: declare 7B AWQ if registration can still be updated; otherwise keep 3B honest",
-        "Never use bf16-7B, GPTQ-Int8 8.875, or Bielik-11B as the Sunday base",
-        "Headline remains the committed CKE May 23–26 eval, not the 90-question MCQ dev set",
-        "Shared notes should say only current Forgehand L40S and should never carry IPs, SSH keys, or secrets"
-      ]
-    },
-    "history_ext_multi_year": {
-      "role": "History Ext Multi-Year",
-      "highlights": [
-        "Formuła 2023 maj papers 2023–2026 PDFs local; converting to official pack format (exam.json + images + answers-template)",
-        "Official mock history-2023-mock-v1 remains the ONLY submission-quality gauge",
-        "Layout: data/history_extended/formulka-2023/history-YYYY-05/; first convert history-2024-05",
-        "No L40S needed yet for conversion; Formuła 2015 deferred"
+        "Best-score tab now anchors on the legal AWQ baseline rather than the illegal bf16 comparator.",
+        "The fh offline stage remains visible as a completed regression, not a promoted Sunday pack candidate.",
+        "3B line still reads: base 26.7%, history-v2 28.3%, modal-v3 17.1%.",
+        "Sunday quality path: declare bare 7B AWQ if registration can still move; otherwise keep the current 3B declaration honest."
       ]
     }
   },
@@ -46,29 +37,12 @@
       "image_open": null,
       "image_closed": null,
       "essay": null,
-      "note": "Scored subset. Per-category public splits are not published yet.",
-      "source": "scores.json placeholder awaiting public CKE output"
-    },
-    {
-      "id": "cke-3b-modal",
-      "sort": 20,
-      "name": "3B modal-v3",
-      "model": "Qwen2.5 3B",
-      "stage": "modal-v3",
-      "status": "COMPLETED",
-      "base_stage_id": "cke-3b-base",
-      "overall_pct": 17.1,
-      "text_open": null,
-      "text_closed": null,
-      "image_open": null,
-      "image_closed": null,
-      "essay": null,
-      "note": "Per-category public splits are not published yet.",
-      "source": "scores.json placeholder awaiting public CKE output"
+      "note": "Legal honest baseline; per-category public splits are not published yet.",
+      "source": "notes/TRACK01_BEST_SCORE.md"
     },
     {
       "id": "cke-3b-history-v2",
-      "sort": 30,
+      "sort": 20,
       "name": "3B history-v2",
       "model": "Qwen2.5 3B",
       "stage": "history-v2",
@@ -80,8 +54,25 @@
       "image_open": null,
       "image_closed": null,
       "essay": null,
-      "note": "Scored subset. Per-category public splits are not published yet.",
-      "source": "scores.json placeholder awaiting public CKE output"
+      "note": "Small public CKE lift over the 3B base.",
+      "source": "notes/TRACK01_BEST_SCORE.md"
+    },
+    {
+      "id": "cke-3b-modal",
+      "sort": 30,
+      "name": "3B modal-v3",
+      "model": "Qwen2.5 3B",
+      "stage": "modal-v3",
+      "status": "COMPLETED",
+      "base_stage_id": "cke-3b-base",
+      "overall_pct": 17.1,
+      "text_open": null,
+      "text_closed": null,
+      "image_open": null,
+      "image_closed": null,
+      "essay": null,
+      "note": "Completed legal tuned pass, but it regresses versus the 3B base.",
+      "source": "notes/TRACK01_BEST_SCORE.md"
     },
     {
       "id": "cke-7b-awq-base",
@@ -97,40 +88,25 @@
       "image_open": null,
       "image_closed": null,
       "essay": null,
-      "note": "Scored 60/154; text-only 38.9%. Per-category public splits are not published yet.",
-      "source": "scores.json placeholder awaiting public CKE output"
+      "note": "Best legal baseline so far; measured pack about 5.582 GB.",
+      "source": "notes/TRACK01_BEST_SCORE.md"
     },
     {
-      "id": "cke-7b-fh",
+      "id": "cke-7b-awq-fh-offline",
       "sort": 50,
-      "name": "7B fh (bf16 lane)",
-      "model": "Qwen2.5 7B",
-      "stage": "fh",
-      "status": "BLOCKED",
+      "name": "7B AWQ + fh LoRA (offline)",
+      "model": "Qwen2.5 7B AWQ",
+      "stage": "fh-offline",
+      "status": "COMPLETED",
       "base_stage_id": "cke-7b-awq-base",
+      "overall_pct": 29.8,
       "text_open": null,
       "text_closed": null,
       "image_open": null,
       "image_closed": null,
       "essay": null,
-      "note": "Illegal bf16 base under the 8.0/8.8 GB caps. No published category scores.",
-      "source": "scores.json placeholder awaiting public CKE output"
-    },
-    {
-      "id": "cke-7b-fh-v2",
-      "sort": 60,
-      "name": "7B fh-v2",
-      "model": "Qwen2.5 7B",
-      "stage": "fh-v2",
-      "status": "BLOCKED",
-      "base_stage_id": "cke-7b-awq-base",
-      "text_open": null,
-      "text_closed": null,
-      "image_open": null,
-      "image_closed": null,
-      "essay": null,
-      "note": "Queued on an illegal bf16 base. No published category scores.",
-      "source": "scores.json placeholder awaiting public CKE output"
+      "note": "Legal run, but it regresses versus the bare AWQ base; demoted from the Sunday pack.",
+      "source": "notes/TRACK01_BEST_SCORE.md"
     }
   ],
   "prize_tracks": [
@@ -139,19 +115,27 @@
       "title": "Best matura score",
       "goal": "Highest honest Sunday exam score under the 8.0 GB base / 8.8 GB after-FT caps.",
       "status": "RUNNING",
-      "summary": "7B AWQ base is the current public honest leader at 37.6%; tuned successors still need valid public eval outputs.",
+      "summary": "Bare 7B AWQ is the current legal leader at 37.6%; the AWQ + fh offline pass regressed to 29.8% and is shown as demoted rather than promoted.",
       "sections": [
         {
           "title": "Baselines (honest bare)",
-          "stage_ids": ["cke-3b-base", "cke-7b-awq-base"]
+          "stage_ids": [
+            "cke-3b-base",
+            "cke-7b-awq-base"
+          ]
         },
         {
           "title": "Interim results",
-          "stage_ids": ["cke-3b-history-v2"]
+          "stage_ids": [
+            "cke-3b-history-v2"
+          ]
         },
         {
           "title": "Best post-training / improvement stages",
-          "stage_ids": ["cke-3b-modal", "cke-7b-fh", "cke-7b-fh-v2"]
+          "stage_ids": [
+            "cke-3b-modal",
+            "cke-7b-awq-fh-offline"
+          ]
         }
       ]
     },
@@ -160,19 +144,27 @@
       "title": "Best progress",
       "goal": "Largest tuned minus honest bare-base improvement on the Sunday exam.",
       "status": "RUNNING",
-      "summary": "3B history-v2 is the only published positive lift so far (+1.6 over 3B base); 7B tuned bf16 lanes are invalid under the size caps.",
+      "summary": "3B history-v2 is the only public positive lift so far (+1.6); the AWQ + fh offline pass is -7.8 below its legal base and remains demoted.",
       "sections": [
         {
           "title": "Baselines (honest bare)",
-          "stage_ids": ["cke-3b-base", "cke-7b-awq-base"]
+          "stage_ids": [
+            "cke-3b-base",
+            "cke-7b-awq-base"
+          ]
         },
         {
           "title": "Interim results",
-          "stage_ids": ["cke-3b-history-v2"]
+          "stage_ids": [
+            "cke-3b-history-v2"
+          ]
         },
         {
           "title": "Best post-training / improvement stages",
-          "stage_ids": ["cke-3b-modal", "cke-7b-fh", "cke-7b-fh-v2"]
+          "stage_ids": [
+            "cke-3b-modal",
+            "cke-7b-awq-fh-offline"
+          ]
         }
       ]
     },
@@ -181,19 +173,27 @@
       "title": "Mały ale wariat",
       "goal": "Smallest model that still reaches at least 35% on the honest Sunday exam.",
       "status": "BLOCKED",
-      "summary": "No ≤3B public run has cleared 35% yet; 3B history-v2 reached 28.3%, while 7B AWQ is the current qualifying benchmark at 37.6%.",
+      "summary": "No ≤3B public run has cleared 35% yet; 7B AWQ at about 5.582 GB is still the current legal benchmark.",
       "sections": [
         {
           "title": "Baselines (honest bare)",
-          "stage_ids": ["cke-3b-base", "cke-7b-awq-base"]
+          "stage_ids": [
+            "cke-3b-base",
+            "cke-7b-awq-base"
+          ]
         },
         {
           "title": "Interim results",
-          "stage_ids": ["cke-3b-history-v2"]
+          "stage_ids": [
+            "cke-3b-history-v2"
+          ]
         },
         {
           "title": "Best post-training / improvement stages",
-          "stage_ids": ["cke-3b-modal"]
+          "stage_ids": [
+            "cke-3b-modal",
+            "cke-7b-awq-fh-offline"
+          ]
         }
       ]
     }
@@ -204,6 +204,12 @@
       "name": "CKE 7B AWQ base",
       "state": "COMPLETED",
       "detail": "37.6% full / 38.9% text-only; measured pack ~5.582 GB"
+    },
+    {
+      "id": "cke-7b-awq-fh-offline",
+      "name": "CKE 7B AWQ + fh LoRA (offline)",
+      "state": "COMPLETED",
+      "detail": "29.8% full / 32.1% text-only; regression vs bare AWQ, demoted"
     },
     {
       "id": "cke-3b-history-v2",
@@ -224,52 +230,38 @@
       "detail": "17.1% / 23.0%; regression vs base"
     },
     {
-      "id": "cke-7b-fh",
-      "name": "CKE 7B fh (bf16 lane)",
+      "id": "size-cap",
+      "name": "Size cap hard 8.0/8.8",
+      "state": "ACTIVE",
+      "detail": "Base <=8.0 GB; after FT <=8.8 GB; AWQ fits, fh offline still legal but not promoted"
+    },
+    {
+      "id": "qwen-7b-bf16",
+      "name": "Qwen 7B bf16 comparator",
       "state": "BLOCKED",
-      "detail": "cancel_requested; illegal Sunday base"
-    },
-    {
-      "id": "qwen-7b-gptq-int8",
-      "name": "Qwen 7B GPTQ-Int8",
-      "state": "PARKED",
-      "detail": "8.875 GB on disk; illegal Sunday base"
-    },
-    {
-      "id": "bielik-11b",
-      "name": "Bielik-11B lanes",
-      "state": "PARKED",
-      "detail": "cancel_requested; illegal Sunday base"
-    },
-    {
-      "id": "history-ext-pack-conversion",
-      "name": "History Ext multi-year pack conversion",
-      "state": "RUNNING",
-      "detail": "Formuła 2023 -> official pack format; history-2024-05 first"
+      "detail": "37.1% / 40.1%; research-only because the base is over the Sunday cap"
     }
   ],
   "mcq": {
     "1.5b_base": {
       "pct": 53.3,
-      "n": "48/90"
-    },
-    "1.5b_modal": {
-      "pct": 85.6,
-      "n": "77/90"
+      "n": "48/90",
+      "note": "dev-only MCQ set, not the headline metric"
     },
     "3b_base": {
       "pct": 56.7,
-      "n": "51/90"
+      "n": "51/90",
+      "note": "dev-only MCQ set, not matura proof"
     },
     "3b_history_v2": {
       "pct": 75.6,
       "n": "68/90",
-      "note": "contaminated — not matura"
+      "note": "contaminated - trained on the same MCQ set"
     },
     "3b_modal_v3": {
       "pct": 94.4,
       "n": "85/90",
-      "note": "contaminated — not headline evidence"
+      "note": "contaminated - not headline evidence"
     },
     "7b_base": {
       "pct": 76.7,
@@ -279,34 +271,20 @@
     "7b_fh": {
       "pct": 100.0,
       "n": "90/90",
-      "note": "contaminated — same 90-MCQ train set"
+      "note": "contaminated - same 90-MCQ train set"
     },
     "7b_fh_v2": {
       "pct": 98.9,
       "n": "89/90",
-      "note": "contaminated — same 90-MCQ train set"
-    },
-    "7b_family": {
-      "base_pct": 76.7,
-      "base_n": "69/90",
-      "fh_pct": 100.0,
-      "fh_n": "90/90",
-      "fh_note": "train-overlap risk",
-      "fh_v2_pct": 98.9,
-      "fh_v2_n": "89/90",
-      "fh_v2_note": "train-overlap risk"
+      "note": "contaminated - same 90-MCQ train set"
     }
   },
   "constraints": {
     "max_base_disk_gb": 8.0,
     "max_after_ft_gb": 8.8,
     "exam": "fully offline Sunday",
-    "registration_base": "registered 3B today; AWQ 7B only if registration is updated",
-    "matura_all": "512 items / 789 pts",
-    "adapters_count_toward_after_ft": true,
-    "cancel": "Bielik-11B bf16 / dapt-bielik / train-bielik / 7B bf16-as-base / GPTQ-Int8 as declared base",
-    "recommended_7b_quant": "Qwen/Qwen2.5-7B-Instruct-AWQ (~5.582 GB)",
-    "size_note": "notes/SIZE_CAP_8GB.md"
+    "registration_base": "registered 3B today; 7B AWQ only if registration can still be updated",
+    "matura_all": "512 items / 789 pts"
   },
   "links": {
     "repo": "https://github.com/OrestTa/matura-model-trainers-hackathon",
