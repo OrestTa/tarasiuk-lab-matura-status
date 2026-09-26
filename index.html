@@ -5,28 +5,52 @@
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <title>Tarasiuk Lab - Matura status</title>
 <style>
-  :root { --bg:#0b1020; --card:#141a2e; --text:#e8ecf7; --muted:#9aa3b8; --ok:#3dd68c; --run:#5b8cff; --warn:#f5a524; --bad:#f2555a; }
+  :root { --bg:#0b1020; --card:#141a2e; --text:#e8ecf7; --muted:#9aa3b8; --ok:#3dd68c; --run:#5b8cff; --warn:#f5a524; --bad:#f2555a; --border:#243055; }
   * { box-sizing: border-box; }
   body { margin:0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, sans-serif; background: radial-gradient(1200px 600px at 10% -10%, #1a2450, var(--bg)); color: var(--text); }
-  main { max-width: 960px; margin: 0 auto; padding: 28px 18px 64px; }
+  main { max-width: 1200px; margin: 0 auto; padding: 28px 18px 64px; }
   h1 { font-size: 1.6rem; margin: 0 0 6px; }
   .sub { color: var(--muted); margin-bottom: 22px; }
   .grid { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
-  .card { background: var(--card); border: 1px solid #243055; border-radius: 14px; padding: 16px 16px 12px; }
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 16px 16px 12px; }
   .card h2 { font-size: 1rem; margin: 0 0 10px; }
+  .section-title { display:flex; flex-wrap:wrap; gap:8px 14px; align-items:baseline; justify-content:space-between; margin-bottom:12px; }
+  .section-title p { margin:0; color:var(--muted); font-size:0.92rem; }
   ul { margin: 0; padding-left: 18px; color: #d5dbeb; }
   li { margin: 6px 0; }
   table { width: 100%; border-collapse: collapse; font-size: 0.92rem; }
-  th, td { text-align: left; padding: 8px 6px; border-bottom: 1px solid #243055; }
+  th, td { text-align: left; padding: 8px 6px; border-bottom: 1px solid var(--border); }
   th { color: var(--muted); font-weight: 600; }
   .pill { display:inline-block; padding: 2px 8px; border-radius: 999px; font-size: 0.75rem; font-weight: 700; letter-spacing: .02em; }
   .COMPLETED { background: rgba(61,214,140,.15); color: var(--ok); }
   .RUNNING { background: rgba(91,140,255,.15); color: var(--run); }
-  .BLOCKED, .PARKED { background: rgba(245,165,36,.15); color: var(--warn); }
-  .pct { font-variant-numeric: tabular-nums; font-weight: 700; }
+  .ACTIVE, .BLOCKED, .PARKED, .QUEUED { background: rgba(245,165,36,.15); color: var(--warn); }
+  .CANCELLED, .CANCEL_REQUESTED, .FAILED { background: rgba(242,85,90,.15); color: var(--bad); }
+  .pct, .mono { font-variant-numeric: tabular-nums; }
+  .pct { font-weight: 700; }
+  .dim { color: var(--muted); }
+  .table-wrap { overflow-x: auto; }
+  .cke-table { min-width: 980px; }
+  .cke-table th:nth-child(n+4),
+  .cke-table td:nth-child(n+4):nth-child(-n+9) { text-align: center; }
+  .stage-name { font-weight: 700; }
+  .stage-meta { display:block; margin-top:4px; color:var(--muted); font-size:0.82rem; }
+  .stage-note { color:#d5dbeb; }
+  .stage-source { display:block; margin-top:4px; color:var(--muted); font-size:0.78rem; }
+  .tabs { display:flex; flex-wrap:wrap; gap:10px; margin-bottom:16px; }
+  .tab-btn { appearance:none; border:1px solid var(--border); background:rgba(255,255,255,0.02); color:var(--text); border-radius:999px; padding:10px 14px; font:inherit; font-weight:700; cursor:pointer; }
+  .tab-btn.active { background:rgba(91,140,255,.18); border-color:#5b8cff; color:#dce7ff; }
+  .tab-panel { display:none; gap:14px; }
+  .tab-panel.active { display:grid; }
+  .track-summary { padding-bottom:16px; }
+  .track-summary h3, .section-block h3 { margin:0; font-size:1rem; }
+  .track-summary p { margin:8px 0 0; }
+  .section-block { display:grid; gap:10px; }
+  .empty-cell { color:var(--muted); }
   a { color: #8eb6ff; }
   footer { margin-top: 22px; color: var(--muted); font-size: 0.85rem; }
   .error { color: #ffb4b8; }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
 </style>
 </head>
 <body>
@@ -35,6 +59,15 @@
   <p class="sub">Warsaw Model Trainers - shared board for <strong>Matura Hack (Grok)</strong> + <strong>Claude</strong> - updated <span id="updated">...</span></p>
 
   <div class="grid" id="tracks"></div>
+
+  <div class="card" style="margin-top:14px">
+    <div class="section-title">
+      <h2>Prize-track board</h2>
+      <p>Each tab shows track goal/status, honest bare baselines, interim results, and the best improvement stages with the same five public CKE columns.</p>
+    </div>
+    <div id="track-tabs" class="tabs" role="tablist"></div>
+    <div id="track-panels"></div>
+  </div>
 
   <div class="card" style="margin-top:14px">
     <h2>Jobs</h2>
@@ -51,44 +84,561 @@
     <ul id="links"></ul>
   </div>
 
-  <footer>No secrets, IPs, or keys on this page. Refresh by updating <code>status.json</code> and republishing this folder.</footer>
+  <footer>No secrets, IPs, or keys on this page. Refresh by updating <code>public_status.json</code> or <code>status.json</code>; optional <code>scores.json</code> or per-item result JSON can publish or recompute the five public CKE columns.</footer>
 </main>
 <script>
-async function main() {
-  const response = await fetch('./status.json', { cache: 'no-store' });
-  if (!response.ok) throw new Error(`status.json returned ${response.status}`);
-  const data = await response.json();
-  document.getElementById('updated').textContent = data.updated;
+const CATEGORY_ORDER = [
+  { id: 'text_open', label: 'text open' },
+  { id: 'text_closed', label: 'text closed' },
+  { id: 'image_open', label: 'image open' },
+  { id: 'image_closed', label: 'image closed' },
+  { id: 'essay', label: 'essay' },
+];
 
-  const tracks = document.getElementById('tracks');
-  for (const track of Object.values(data.tracks)) {
-    const el = document.createElement('div');
-    el.className = 'card';
-    el.innerHTML = `<h2>${track.role}</h2><ul>${track.highlights.map(h => `<li>${h}</li>`).join('')}</ul>`;
-    tracks.appendChild(el);
+const CATEGORY_ALIASES = {
+  text_open: ['text_open', 'text open', 'text-open', 'textOpen'],
+  text_closed: ['text_closed', 'text closed', 'text-closed', 'textClosed'],
+  image_open: ['image_open', 'image open', 'image-open', 'imageOpen'],
+  image_closed: ['image_closed', 'image closed', 'image-closed', 'imageClosed'],
+  essay: ['essay'],
+};
+
+function escapeHtml(value) {
+  return String(value ?? '')
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#39;');
+}
+
+function slugify(value) {
+  return String(value || '')
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '') || 'unknown';
+}
+
+async function fetchJson(path, { required = false } = {}) {
+  const response = await fetch(path, { cache: 'no-store' });
+  if (response.ok) return response.json();
+  if (!required && response.status === 404) return null;
+  throw new Error(`${path} returned ${response.status}`);
+}
+
+function pickCategoryMetric(source, categoryId) {
+  const aliases = CATEGORY_ALIASES[categoryId] || [categoryId];
+  for (const key of aliases) {
+    if (source && Object.prototype.hasOwnProperty.call(source, key)) return source[key];
+  }
+  return null;
+}
+
+function coercePct(value) {
+  if (typeof value === 'number' && Number.isFinite(value)) return value;
+  if (typeof value === 'string') {
+    const match = value.match(/-?\d+(?:\.\d+)?/);
+    if (match) return Number(match[0]);
+  }
+  return null;
+}
+
+function normalizeMetric(metric) {
+  if (metric == null) return { pct: null, n: '', note: '' };
+  if (typeof metric === 'number' || typeof metric === 'string') {
+    return { pct: coercePct(metric), n: '', note: '' };
+  }
+  return {
+    pct: coercePct(metric.pct ?? metric.percent ?? metric.score_pct ?? metric.score),
+    n: metric.n ?? metric.items ?? metric.count ?? '',
+    note: metric.note ?? '',
+  };
+}
+
+function normalizeStage(stage = {}) {
+  const stageCategories = stage.categories ?? stage.scores ?? {};
+  const metrics = Object.fromEntries(CATEGORY_ORDER.map((category) => [
+    category.id,
+    normalizeMetric(
+      pickCategoryMetric(stageCategories, category.id) ??
+      pickCategoryMetric(stage, category.id)
+    ),
+  ]));
+
+  const overall = normalizeMetric(stage.overall ?? {
+    pct: stage.overall_pct ?? stage.pct,
+    n: stage.overall_n ?? stage.n,
+    note: stage.overall_note,
+  });
+
+  const model = stage.model ?? stage.family ?? '';
+  const stageName = stage.stage ?? stage.run ?? stage.name ?? stage.label ?? '';
+  return {
+    id: stage.id ?? stage.job_id ?? slugify(`${model}-${stageName}`),
+    name: stage.name ?? stage.label ?? ([model, stageName].filter(Boolean).join(' ') || 'Unnamed stage'),
+    model,
+    stage: stage.stage ?? '',
+    status: stage.status ?? 'PENDING',
+    overall,
+    metrics,
+    baseStageId: stage.base_stage_id ?? stage.baseStageId ?? '',
+    honestBare: Boolean(stage.honest_bare ?? stage.honestBare),
+    deltaPct: coercePct(stage.delta_vs_base_pct ?? stage.deltaPct),
+    note: stage.note ?? '',
+    source: stage.source ?? '',
+    byCategory: stage.by_category ?? stage.byCategory ?? null,
+    inlineResults: stage.results && typeof stage.results === 'object' ? stage.results : (Array.isArray(stage.items) ? stage.items : null),
+    resultsPath: stage.results_path ?? stage.results_url ?? stage.items_path ?? stage.items_url ?? '',
+    sort: Number.isFinite(stage.sort) ? stage.sort : 999,
+  };
+}
+
+function parseOverallFromDetail(detail) {
+  const match = String(detail || '').match(/(\d+(?:\.\d+)?)%/);
+  return match ? Number(match[1]) : null;
+}
+
+function deriveStages(data) {
+  return (data.jobs || [])
+    .filter((job) => /^cke-/i.test(job.id || '') || /^cke\b/i.test(job.name || ''))
+    .map((job, index) => {
+      const name = String(job.name || '').replace(/^CKE\s+/i, '') || job.id || `CKE stage ${index + 1}`;
+      const parts = name.split(/\s+/);
+      const model = parts.shift() || '';
+      const stage = parts.join(' ') || 'run';
+      return normalizeStage({
+        id: job.id || slugify(name),
+        name,
+        model,
+        stage,
+        status: job.state,
+        overall_pct: parseOverallFromDetail(job.detail),
+        note: job.detail && !/%/.test(job.detail) ? job.detail : '',
+        source: 'derived from jobs[]',
+        sort: index,
+      });
+    });
+}
+
+function mergeStages(...collections) {
+  const merged = new Map();
+  for (const collection of collections) {
+    for (const candidate of collection || []) {
+      const stage = normalizeStage(candidate);
+      const existing = merged.get(stage.id);
+      if (!existing) {
+        merged.set(stage.id, stage);
+        continue;
+      }
+      const metrics = { ...existing.metrics };
+      for (const category of CATEGORY_ORDER) {
+        const nextMetric = stage.metrics[category.id];
+        if (nextMetric && (nextMetric.pct != null || nextMetric.n || nextMetric.note)) {
+          metrics[category.id] = nextMetric;
+        }
+      }
+      merged.set(stage.id, {
+        ...existing,
+        ...stage,
+        name: stage.name || existing.name,
+        model: stage.model || existing.model,
+        stage: stage.stage || existing.stage,
+        status: stage.status || existing.status,
+        overall: stage.overall.pct != null || stage.overall.n || stage.overall.note ? stage.overall : existing.overall,
+        note: stage.note || existing.note,
+        source: stage.source || existing.source,
+        metrics,
+        baseStageId: stage.baseStageId || existing.baseStageId,
+        honestBare: stage.honestBare || existing.honestBare,
+        deltaPct: stage.deltaPct ?? existing.deltaPct,
+        byCategory: stage.byCategory || existing.byCategory,
+        inlineResults: stage.inlineResults || existing.inlineResults,
+        resultsPath: stage.resultsPath || existing.resultsPath,
+        sort: Math.min(existing.sort, stage.sort),
+      });
+    }
+  }
+  return [...merged.values()].sort((left, right) => left.sort - right.sort || left.name.localeCompare(right.name));
+}
+
+function extractConfiguredStages(data) {
+  if (!data) return [];
+  if (Array.isArray(data.stages)) return data.stages;
+  if (Array.isArray(data.cke_runs)) return data.cke_runs;
+  if (data.cke && Array.isArray(data.cke.runs)) return data.cke.runs;
+  if (Array.isArray(data.runs)) return data.runs;
+  return [];
+}
+
+function extractPrizeTracks(data) {
+  return Array.isArray(data?.prize_tracks) ? data.prize_tracks : [];
+}
+
+function metricDisplay(metric) {
+  const pct = metric.pct != null ? `${metric.pct}%` : '—';
+  const suffix = metric.n ? ` (${metric.n})` : '';
+  return `${pct}${suffix}`;
+}
+
+function firstArray(...values) {
+  for (const value of values) {
+    if (Array.isArray(value)) return value;
+  }
+  return [];
+}
+
+function extractItems(payload) {
+  if (Array.isArray(payload)) return payload;
+  if (!payload || typeof payload !== 'object') return [];
+  return firstArray(
+    payload.items,
+    payload.results,
+    payload.samples,
+    payload.records,
+    payload.examples
+  );
+}
+
+function numericValue(...values) {
+  for (const value of values) {
+    if (typeof value === 'number' && Number.isFinite(value)) return value;
+    if (typeof value === 'string' && value.trim() !== '' && !Number.isNaN(Number(value))) return Number(value);
+  }
+  return null;
+}
+
+function inferEarnedPossible(item) {
+  const earned = numericValue(
+    item.points_earned,
+    item.earned_points,
+    item.obtained_points,
+    item.score_value,
+    item.score,
+    item.points
+  );
+  const possible = numericValue(
+    item.points_possible,
+    item.max_points,
+    item.total_points,
+    item.max_score,
+    item.possible_points
+  );
+
+  if (earned != null && possible != null && possible > 0) return { earned, possible };
+
+  const isCorrect = [item.is_correct, item.correct, item.passed, item.pass].find((value) => typeof value === 'boolean');
+  if (typeof isCorrect === 'boolean') return { earned: isCorrect ? 1 : 0, possible: 1 };
+
+  const result = typeof item.result === 'string' ? item.result.toLowerCase() : '';
+  if (['correct', 'passed', 'pass', 'true'].includes(result)) return { earned: 1, possible: 1 };
+  if (['incorrect', 'failed', 'fail', 'false'].includes(result)) return { earned: 0, possible: 1 };
+
+  return null;
+}
+
+function boardCategoryForItem(item) {
+  const goldCategory = String(
+    item.gold_category ??
+    item.goldCategory ??
+    item.category ??
+    item.gold_label ??
+    ''
+  ).trim();
+  const needsImage = Boolean(item.needs_image ?? item.needsImage);
+
+  if (goldCategory === 'essay') return 'essay';
+  if (['short_open', 'source_analysis'].includes(goldCategory)) {
+    return needsImage ? 'image_open' : 'text_open';
+  }
+  if (['closed_choice', 'matching', 'true_false'].includes(goldCategory)) {
+    return needsImage ? 'image_closed' : 'text_closed';
+  }
+  return null;
+}
+
+function roundPct(value) {
+  return Math.round(value * 10) / 10;
+}
+
+function metricFromAggregate(aggregate) {
+  if (!aggregate || aggregate.possible <= 0) return { pct: null, n: '', note: '' };
+  return {
+    pct: roundPct((aggregate.earned / aggregate.possible) * 100),
+    n: `${roundPct(aggregate.earned)}/${roundPct(aggregate.possible)}`,
+    note: aggregate.weighted ? 'pts' : '',
+  };
+}
+
+function transformLegacySummary(byCategory) {
+  if (!byCategory || typeof byCategory !== 'object') return {};
+  const essayMetric = normalizeMetric(byCategory.essay);
+  return essayMetric.pct != null || essayMetric.n || essayMetric.note ? { essay: essayMetric } : {};
+}
+
+function transformStageResults(payload) {
+  const items = extractItems(payload);
+  if (!items.length) return {};
+
+  const grouped = Object.fromEntries(CATEGORY_ORDER.map((category) => [category.id, { earned: 0, possible: 0, weighted: false }]));
+  const overall = { earned: 0, possible: 0, weighted: false };
+
+  for (const item of items) {
+    const score = inferEarnedPossible(item);
+    if (!score) continue;
+
+    overall.earned += score.earned;
+    overall.possible += score.possible;
+    overall.weighted = overall.weighted || score.possible !== 1;
+
+    const bucket = boardCategoryForItem(item);
+    if (!bucket) continue;
+
+    grouped[bucket].earned += score.earned;
+    grouped[bucket].possible += score.possible;
+    grouped[bucket].weighted = grouped[bucket].weighted || score.possible !== 1;
   }
 
-  document.getElementById('jobs').innerHTML = data.jobs.map(job =>
-    `<tr><td>${job.name}</td><td><span class="pill ${job.state}">${job.state}</span></td><td>${job.detail || ''}</td></tr>`
-  ).join('');
+  const transformed = Object.fromEntries(CATEGORY_ORDER.map((category) => [
+    category.id,
+    metricFromAggregate(grouped[category.id]),
+  ]));
+  return {
+    metrics: transformed,
+    overall: metricFromAggregate(overall),
+  };
+}
 
-  document.getElementById('mcq').innerHTML = Object.entries(data.mcq).map(([name, value]) =>
-    `<tr><td>${name}</td><td class="pct">${value.pct != null ? `${value.pct}% (${value.n})` : 'pending'}</td><td>${value.note || ''}</td></tr>`
-  ).join('');
+function mergeStageTransform(stage, transformed) {
+  if (!transformed) return stage;
+  const metrics = { ...stage.metrics };
+  for (const category of CATEGORY_ORDER) {
+    const nextMetric = transformed.metrics?.[category.id] ?? transformed[category.id];
+    if (nextMetric && (nextMetric.pct != null || nextMetric.n || nextMetric.note)) {
+      metrics[category.id] = normalizeMetric(nextMetric);
+    }
+  }
+  return {
+    ...stage,
+    metrics,
+    overall: transformed.overall && (transformed.overall.pct != null || transformed.overall.n || transformed.overall.note)
+      ? normalizeMetric(transformed.overall)
+      : stage.overall,
+  };
+}
 
-  const links = data.links;
-  const constraints = data.constraints;
+async function hydrateStages(stageCandidates) {
+  const stages = mergeStages(stageCandidates);
+  return Promise.all(stages.map(async (candidate) => {
+    let stage = normalizeStage(candidate);
+    stage = mergeStageTransform(stage, transformLegacySummary(stage.byCategory));
+
+    const payload = stage.inlineResults
+      ? stage.inlineResults
+      : (stage.resultsPath ? await fetchJson(stage.resultsPath) : null);
+
+    if (payload) {
+      stage = mergeStageTransform(stage, transformStageResults(payload));
+      if (stage.resultsPath && !stage.source) {
+        stage.source = stage.resultsPath;
+      }
+    }
+
+    return stage;
+  }));
+}
+
+function withDerivedDeltas(stages) {
+  const lookup = new Map(stages.map((stage) => [stage.id, stage]));
+  return stages.map((stage) => {
+    if (stage.deltaPct != null) return stage;
+    if (stage.honestBare) return { ...stage, deltaPct: 0 };
+    const base = stage.baseStageId ? lookup.get(stage.baseStageId) : null;
+    if (base && stage.overall.pct != null && base.overall.pct != null) {
+      return { ...stage, deltaPct: roundPct(stage.overall.pct - base.overall.pct) };
+    }
+    return stage;
+  });
+}
+
+function deltaDisplay(stage) {
+  if (stage.honestBare && stage.deltaPct === 0) return 'base';
+  if (stage.deltaPct == null) return '—';
+  const sign = stage.deltaPct > 0 ? '+' : '';
+  return `${sign}${stage.deltaPct}%`;
+}
+
+function stageRowsMarkup(stages) {
+  if (!stages.length) {
+    return `<tr><td colspan="10" class="empty-cell">No published stages for this section yet.</td></tr>`;
+  }
+
+  return stages.map((stage) => {
+    const cells = CATEGORY_ORDER.map((category) => {
+      const metric = stage.metrics[category.id];
+      const title = metric.note ? ` title="${escapeHtml(metric.note)}"` : '';
+      return `<td class="pct"${title}>${escapeHtml(metricDisplay(metric))}</td>`;
+    }).join('');
+    const overall = stage.overall.pct != null ? metricDisplay(stage.overall) : '—';
+    return `
+      <tr>
+        <td>
+          <span class="stage-name">${escapeHtml(stage.name)}</span>
+          ${(stage.model || stage.stage) ? `<span class="stage-meta">${escapeHtml([stage.model, stage.stage].filter(Boolean).join(' — '))}</span>` : ''}
+        </td>
+        <td><span class="pill ${escapeHtml(stage.status)}">${escapeHtml(stage.status)}</span></td>
+        <td class="pct">${escapeHtml(overall)}</td>
+        <td class="pct">${escapeHtml(deltaDisplay(stage))}</td>
+        ${cells}
+        <td class="stage-note">${escapeHtml(stage.note || '')}${stage.source ? `<span class="stage-source">Source: ${escapeHtml(stage.source)}</span>` : ''}</td>
+      </tr>`;
+  }).join('');
+}
+
+function stageTableMarkup(stages) {
+  return `
+    <div class="table-wrap">
+      <table class="cke-table">
+        <thead>
+          <tr>
+            <th>stage</th>
+            <th>status</th>
+            <th>overall</th>
+            <th>delta vs base</th>
+            <th>text open</th>
+            <th>text closed</th>
+            <th>image open</th>
+            <th>image closed</th>
+            <th>essay</th>
+            <th>note</th>
+          </tr>
+        </thead>
+        <tbody>${stageRowsMarkup(stages)}</tbody>
+      </table>
+    </div>`;
+}
+
+function renderPrizeTracks(trackConfig, stages) {
+  const tabs = document.getElementById('track-tabs');
+  const panels = document.getElementById('track-panels');
+  const stageLookup = new Map(stages.map((stage) => [stage.id, stage]));
+
+  if (!trackConfig.length) {
+    tabs.innerHTML = '';
+    panels.innerHTML = stageTableMarkup(stages);
+    return;
+  }
+
+  tabs.innerHTML = trackConfig.map((track, index) => `
+    <button
+      type="button"
+      class="tab-btn${index === 0 ? ' active' : ''}"
+      data-track-tab="${escapeHtml(track.id)}"
+      role="tab"
+      aria-selected="${index === 0 ? 'true' : 'false'}"
+    >${escapeHtml(track.title)}</button>
+  `).join('');
+
+  panels.innerHTML = trackConfig.map((track, index) => {
+    const sections = (track.sections || []).map((section) => {
+      const sectionStages = (section.stage_ids || []).map((id) => stageLookup.get(id)).filter(Boolean);
+      return `
+        <div class="card section-block">
+          <h3>${escapeHtml(section.title)}</h3>
+          ${stageTableMarkup(sectionStages)}
+        </div>`;
+    }).join('');
+
+    return `
+      <section class="tab-panel${index === 0 ? ' active' : ''}" data-track-panel="${escapeHtml(track.id)}">
+        <div class="card track-summary">
+          <div class="section-title">
+            <h3>${escapeHtml(track.title)}</h3>
+            <span class="pill ${escapeHtml(track.status || 'ACTIVE')}">${escapeHtml(track.status || 'ACTIVE')}</span>
+          </div>
+          <p><strong>Goal:</strong> ${escapeHtml(track.goal || '')}</p>
+          ${track.summary ? `<p class="dim">${escapeHtml(track.summary)}</p>` : ''}
+        </div>
+        ${sections}
+      </section>`;
+  }).join('');
+
+  if (typeof document.querySelectorAll !== 'function') return;
+
+  const buttons = [...document.querySelectorAll('[data-track-tab]')];
+  const tabPanels = [...document.querySelectorAll('[data-track-panel]')];
+  for (const button of buttons) {
+    button.addEventListener('click', () => {
+      const target = button.getAttribute('data-track-tab');
+      for (const other of buttons) {
+        const active = other === button;
+        other.classList.toggle('active', active);
+        other.setAttribute('aria-selected', active ? 'true' : 'false');
+      }
+      for (const panel of tabPanels) {
+        panel.classList.toggle('active', panel.getAttribute('data-track-panel') === target);
+      }
+    });
+  }
+}
+
+function renderTracks(data) {
+  const tracks = document.getElementById('tracks');
+  tracks.innerHTML = '';
+  for (const track of Object.values(data.tracks || {})) {
+    const el = document.createElement('div');
+    el.className = 'card';
+    el.innerHTML = `<h2>${escapeHtml(track.role)}</h2><ul>${(track.highlights || []).map((highlight) => `<li>${escapeHtml(highlight)}</li>`).join('')}</ul>`;
+    tracks.appendChild(el);
+  }
+}
+
+function renderJobs(data) {
+  document.getElementById('jobs').innerHTML = (data.jobs || []).map((job) =>
+    `<tr><td>${escapeHtml(job.name)}</td><td><span class="pill ${escapeHtml(job.state)}">${escapeHtml(job.state)}</span></td><td>${escapeHtml(job.detail || '')}</td></tr>`
+  ).join('');
+}
+
+function renderMcq(data) {
+  document.getElementById('mcq').innerHTML = Object.entries(data.mcq || {}).map(([name, value]) =>
+    `<tr><td>${escapeHtml(name)}</td><td class="pct">${value.pct != null ? `${escapeHtml(value.pct)}% (${escapeHtml(value.n)})` : 'pending'}</td><td>${escapeHtml(value.note || '')}</td></tr>`
+  ).join('');
+}
+
+function renderLinks(data) {
+  const links = data.links || {};
+  const constraints = data.constraints || {};
   document.getElementById('links').innerHTML = `
-    <li>Base disk cap: <strong>${constraints.max_base_disk_gb} GB</strong> (LoRA excluded) - registered base: ${constraints.registration_base}</li>
-    <li>Exam: ${constraints.exam}</li>
-    <li><a href="${links.leaderboard}">Practice leaderboard</a></li>
-    <li><a href="${links.repo}">Private working repo</a></li>
-    <li><a href="${links.audit_issue}">COMMIT_AUDIT issue #6</a> (collaborators only)</li>
+    <li>Base disk cap: <strong>${escapeHtml(constraints.max_base_disk_gb)} GB</strong>; after fine-tune cap: <strong>${escapeHtml(constraints.max_after_ft_gb)} GB</strong>; registered base: ${escapeHtml(constraints.registration_base || '')}</li>
+    <li>Exam: ${escapeHtml(constraints.exam || '')}</li>
+    <li><a href="${escapeHtml(links.leaderboard || '#')}">Practice leaderboard</a></li>
+    <li><a href="${escapeHtml(links.repo || '#')}">Private working repo</a></li>
+    <li><a href="${escapeHtml(links.audit_issue || '#')}">COMMIT_AUDIT issue #6</a> (collaborators only)</li>
   `;
 }
 
+async function main() {
+  const publicStatus = await fetchJson('./public_status.json');
+  const status = publicStatus || await fetchJson('./status.json', { required: true });
+  const scoreData = await fetchJson('./scores.json');
+
+  document.getElementById('updated').textContent = status.updated;
+
+  renderTracks(status);
+  renderJobs(status);
+  renderMcq(status);
+  renderLinks(status);
+
+  const configuredStages = extractConfiguredStages(status);
+  const publicStages = extractConfiguredStages(publicStatus);
+  const scoreStages = extractConfiguredStages(scoreData);
+  const derivedStages = deriveStages(status);
+  const hydratedStages = withDerivedDeltas(await hydrateStages(mergeStages(derivedStages, configuredStages, publicStages, scoreStages)));
+  renderPrizeTracks(extractPrizeTracks(status), hydratedStages);
+}
+
 main().catch((error) => {
-  document.getElementById('tracks').innerHTML = `<div class="card error"><h2>Board failed to load</h2><p>${error.message}</p></div>`;
+  document.getElementById('tracks').innerHTML = `<div class="card error"><h2>Board failed to load</h2><p>${escapeHtml(error.message)}</p></div>`;
 });
 </script>
 </body>
