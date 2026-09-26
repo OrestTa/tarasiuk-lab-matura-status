@@ -1,5 +1,5 @@
 {
-  "updated": "2026-09-26T14:33:36.207784+02:00",
+  "updated": "2026-09-26T13:33:16+00:00",
   "team": "Tarasiuk Lab",
   "hackathon": "Warsaw Model Trainers \u2014 Polish history matura",
   "tracks": {
@@ -7,26 +7,33 @@
       "role": "Matura Hack (Grok Bot)",
       "highlights": [
         "HARD size caps: base \u22648.0 GB, after FT (base+adapters) \u22648.8 GB \u2014 see notes/SIZE_CAP_8GB.md",
-        "GPTQ-Int8 7B (8.875 GB) ILLEGAL as Sunday base; switch to AWQ (~5.58 GB) or stay on 3B (~6.18 GB)",
-        "Cancel: Bielik-11B / dapt-bielik / train-bielik / 11B baselines; SIGTERM bf16-7B oversize evals when SSH up",
-        "PARALLEL L40S: live cke_3b_history_v2 (~9GB) + cke_7b_fh (~15GB); queue cke_7b_fh_v2",
-        "CKE done: 3B base 26.7%, 3B modal-v3 17.1%, 7B base 37.1% (scored subset)",
-        "fh-v2 LoRA train + dl7b COMPLETED; gpu_admit reservations active"
+        "Bielik-11B is OUT for Sunday: no DAPT/train/serve path; prefer Qwen2.5-3B or Qwen2.5-7B-Instruct-AWQ",
+        "Official model-quality gauge is ONLY history-2023-mock-v1 (37 items / 60 pts); MCQ/CKE remain research signal",
+        "Qwen2.5-3B bare run on the official mock produced 37/37 answers with essay 301 words; this is not an official graded score",
+        "GPTQ-Int8 7B (8.875 GB) remains illegal as a declared base; AWQ (~5.58 GB) is the legal 7B path",
+        "Forgehand SSH recovered on a replacement host; public board intentionally omits the access endpoint",
+        "Single-session Forgehand discipline remains: do not start a second GPU session"
       ]
     },
     "claude": {
       "role": "Claude Opus on trunk",
       "highlights": [
         "STOP oversize: Bielik-11B bf16 (~22.3 GB) \u2014 do not DAPT/train/serve for Sunday; caps base\u22648.0 afterFT\u22648.8",
-        "gpu_admit.py \u2014 share L40S by free GB (not exclusive card)",
-        "dapt-prep corpus OK (CPU); do NOT start dapt-bielik/train-bielik on 11B",
-        "Queue: retarget baselines to \u22648 GB bases (3B / AWQ-7B / Bielik-4.5 FP8); no 11B",
+        "Retarget baselines to legal bases only: Qwen2.5-3B or AWQ/GPTQ-Int4 7B; no bf16 7B Sunday path",
+        "Use history-2023-mock-v1 as the only quality claim board; MCQ/CKE stay secondary research telemetry",
+        "3B bare official-mock pass was a completeness run (37/37 answers), not an organizer-issued score",
         "matura_all = 512 items / 789 pts (dup EHIP dropped); headline May 23\u201326",
         "MODELS=all skips -bf16; AWS needs AWS_REENABLED=1"
       ]
     }
   },
   "jobs": [
+    {
+      "id": "official-mock-3b",
+      "name": "Official mock history-2023-mock-v1 (Qwen2.5-3B bare)",
+      "state": "COMPLETED",
+      "detail": "37/37 nonempty, essay 301 words, OCR-only images; completeness run only, not an official score"
+    },
     {
       "id": "fh-7b-v2",
       "name": "Forgehand 7B LoRA fh-v2",
@@ -108,6 +115,17 @@
       "detail": "exam path illegal"
     }
   ],
+  "official_eval": {
+    "exam_id": "history-2023-mock-v1",
+    "items": 37,
+    "max_points": 60,
+    "quality_gauge": "ONLY board-approved gauge of model quality",
+    "model": "Qwen2.5-3B-Instruct bare via transformers-hf",
+    "result": "37/37 nonempty answers produced locally",
+    "official_score": "pending organizer grading; local completeness is not a score",
+    "essay_words": 301,
+    "vision": "OCR only; no vision pixels fed"
+  },
   "mcq": {
     "1.5b_base": {
       "pct": 53.3,
@@ -162,6 +180,8 @@
     "max_after_ft_gb": 8.8,
     "exam": "fully offline Sunday",
     "registration_base": "prefer Qwen2.5-3B (~6.18 GB); 7B only AWQ/GPTQ-Int4 \u22648.0 \u2014 NOT GPTQ-Int8 (8.875) or bf16",
+    "quality_gauge": "Only official mock history-2023-mock-v1 should be used for model-quality claims",
+    "official_mock_note": "3B bare pass yielded 37/37 answers, but that was a completeness run, not an official scored result",
     "matura_all": "512 items / 789 pts",
     "adapters_count_toward_after_ft": true,
     "cancel": "Bielik-11B bf16 / dapt-bielik / train-bielik / 7B bf16-as-base / GPTQ-Int8 as declared base",

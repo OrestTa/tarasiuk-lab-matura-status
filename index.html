@@ -22,7 +22,7 @@
   .pill { display:inline-block; padding: 2px 8px; border-radius: 999px; font-size: 0.75rem; font-weight: 700; letter-spacing: .02em; }
   .COMPLETED { background: rgba(61,214,140,.15); color: var(--ok); }
   .RUNNING { background: rgba(91,140,255,.15); color: var(--run); }
-  .BLOCKED, .PARKED { background: rgba(245,165,36,.15); color: var(--warn); }
+  .BLOCKED, .PARKED, .CANCEL_REQUESTED, .CANCELLED { background: rgba(245,165,36,.15); color: var(--warn); }
   .pct { font-variant-numeric: tabular-nums; font-weight: 700; }
   a { color: #8eb6ff; }
   footer { margin-top: 22px; color: var(--muted); font-size: 0.85rem; }
@@ -42,7 +42,12 @@
   </div>
 
   <div class="card" style="margin-top:14px">
-    <h2>History MCQ (90 easy items - contaminated LoRAs flagged)</h2>
+    <h2>Official mock quality gauge</h2>
+    <table><tbody id="official"></tbody></table>
+  </div>
+
+  <div class="card" style="margin-top:14px">
+    <h2>Research evals (not official quality gauge)</h2>
     <table><thead><tr><th>Pass</th><th>Score</th><th>Note</th></tr></thead><tbody id="mcq"></tbody></table>
   </div>
 
@@ -51,7 +56,7 @@
     <ul id="links"></ul>
   </div>
 
-  <footer>No secrets, IPs, or keys on this page. Refresh by updating <code>status.json</code> and republishing this folder.</footer>
+  <footer>No secrets, IPs, or private access details on this page. Refresh by updating <code>status.json</code> and republishing this folder.</footer>
 </main>
 <script>
 async function main() {
@@ -72,6 +77,17 @@ async function main() {
     `<tr><td>${job.name}</td><td><span class="pill ${job.state}">${job.state}</span></td><td>${job.detail || ''}</td></tr>`
   ).join('');
 
+  const official = data.official_eval;
+  document.getElementById('official').innerHTML = `
+    <tr><th>Exam</th><td>${official.exam_id} (${official.items} items / ${official.max_points} pts)</td></tr>
+    <tr><th>Status</th><td>${official.quality_gauge}</td></tr>
+    <tr><th>Model</th><td>${official.model}</td></tr>
+    <tr><th>Result</th><td>${official.result}</td></tr>
+    <tr><th>Score note</th><td>${official.official_score}</td></tr>
+    <tr><th>Essay</th><td>${official.essay_words} words</td></tr>
+    <tr><th>Vision path</th><td>${official.vision}</td></tr>
+  `;
+
   document.getElementById('mcq').innerHTML = Object.entries(data.mcq).map(([name, value]) =>
     `<tr><td>${name}</td><td class="pct">${value.pct != null ? `${value.pct}% (${value.n})` : 'pending'}</td><td>${value.note || ''}</td></tr>`
   ).join('');
@@ -79,7 +95,9 @@ async function main() {
   const links = data.links;
   const constraints = data.constraints;
   document.getElementById('links').innerHTML = `
-    <li>Base disk cap: <strong>${constraints.max_base_disk_gb} GB</strong> (LoRA excluded) - registered base: ${constraints.registration_base}</li>
+    <li>Base disk cap: <strong>${constraints.max_base_disk_gb} GB</strong>; after fine-tuning cap (base + adapters): <strong>${constraints.max_after_ft_gb} GB</strong> - registered base: ${constraints.registration_base}</li>
+    <li>Quality gate: ${constraints.quality_gauge}</li>
+    <li>Official mock note: ${constraints.official_mock_note}</li>
     <li>Exam: ${constraints.exam}</li>
     <li><a href="${links.leaderboard}">Practice leaderboard</a></li>
     <li><a href="${links.repo}">Private working repo</a></li>
