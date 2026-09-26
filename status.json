@@ -1,5 +1,5 @@
 {
-  "updated": "2026-09-26T16:51:00+02:00",
+  "updated": "2026-09-26T17:05:40+02:00",
   "team": "Tarasiuk Lab",
   "hackathon": "Warsaw Model Trainers — Polish history matura",
   "tracks": {
@@ -37,16 +37,16 @@
       "sort": 5,
       "name": "Official mock Bielik-4.5B FP8 (Claude)",
       "model": "Bielik-4.5B FP8",
-      "stage": "base",
+      "stage": "harness",
       "status": "COMPLETED",
-      "honest_bare": true,
+      "honest_bare": false,
       "overall_pct": 40.0,
       "text_open": null,
       "text_closed": null,
       "image_open": null,
       "image_closed": null,
       "essay": null,
-      "note": "Claude-graded 24/60 vs CKE key; ~4.90 GB on-disk FP8 pack. Current best verified official-mock score under caps.",
+      "note": "Claude-graded 24/60 vs CKE key on harness answer-sheet / structured-layout answers; ~4.90 GB on-disk FP8 pack. Current best verified official-mock score under caps.",
       "source": "results/tracks.json#g-official-mock-bielik45-fp8-claude"
     },
     {
@@ -104,16 +104,16 @@
       "sort": 18,
       "name": "E2E 2023 mock Qwen2.5-3B (Grok)",
       "model": "Qwen2.5 3B",
-      "stage": "base",
+      "stage": "harness",
       "status": "COMPLETED",
-      "honest_bare": true,
+      "honest_bare": false,
       "overall_pct": 25.0,
       "text_open": 27.3,
       "text_closed": 50.0,
       "image_open": 21.7,
       "image_closed": 42.9,
       "essay": 13.3,
-      "note": "Judges separate: Grok 25.0% (15/60) · Claude 18.3% (11/60) · Sol 21.7%. Five cats on Grok row.",
+      "note": "Harness run with OCR fallback for image items; judges separate: Grok 25.0% (15/60) · Claude 18.3% (11/60) · Sol 21.7%. Five cats on Grok row.",
       "source": "results/judged/e2e_oneyear_2023_qwen25-3b/"
     },
     {
@@ -121,16 +121,16 @@
       "sort": 30,
       "name": "3B CKE headline-auto",
       "model": "Qwen2.5 3B",
-      "stage": "base",
+      "stage": "harness",
       "status": "COMPLETED",
-      "honest_bare": true,
+      "honest_bare": false,
       "overall_pct": 26.7,
       "text_open": null,
       "text_closed": null,
       "image_open": null,
       "image_closed": null,
       "essay": null,
-      "note": "Proxy only (70 auto-scored CKE pts). Not the official-mock gauge.",
+      "note": "Harness/router proxy only (70 auto-scored CKE pts). Not untouched plain prompt or official-mock proof.",
       "source": "notes/TRACK01_BEST_SCORE.md"
     },
     {
@@ -172,16 +172,16 @@
       "sort": 60,
       "name": "7B AWQ CKE headline-auto",
       "model": "Qwen2.5 7B AWQ",
-      "stage": "base",
+      "stage": "harness",
       "status": "COMPLETED",
-      "honest_bare": true,
+      "honest_bare": false,
       "overall_pct": 37.6,
       "text_open": null,
       "text_closed": null,
       "image_open": null,
       "image_closed": null,
       "essay": null,
-      "note": "UNVERIFIED auto-scored 70-pt subset only. Official mock Claude grade is 18.3%. Do not treat as Sunday proof.",
+      "note": "UNVERIFIED harness/router auto-scored 70-pt subset only. Official mock Claude grade is 18.3%. Do not treat as official-mock proof.",
       "source": "results/tracks.json#g-7b-awq"
     },
     {
@@ -215,7 +215,7 @@
       "image_open": null,
       "image_closed": null,
       "essay": null,
-      "note": "Harness cats, not five CKE; 6.66 GB disk."
+      "note": "Raw plain-prompt base; harness cats, not five CKE; 6.66 GB disk. UNVERIFIED until results/progress/summary.json and ship.json land in the hackathon repo."
     },
     {
       "id": "progress-nf4-routed",
@@ -231,7 +231,7 @@
       "image_open": null,
       "image_closed": null,
       "essay": null,
-      "note": "Same pack routed harness; Δ +1.4 pp vs raw."
+      "note": "Same pack routed harness; Δ +1.4 pp vs raw. UNVERIFIED until results/progress/summary.json and ship.json land in the hackathon repo."
     }
   ],
   "prize_tracks": [
@@ -244,20 +244,19 @@
       "sections": [
         {
           "title": "Baselines (honest bare)",
-          "stage_ids": [
-            "mock-bielik45-fp8-claude",
-            "mock-e2e-3b-grok",
-            "cke-3b-base",
-            "cke-7b-awq-base"
-          ]
+          "stage_ids": []
         },
         {
           "title": "Interim results",
           "stage_ids": [
+            "mock-bielik45-fp8-claude",
             "mock-bielik45-fp8-grok",
             "mock-awq7b-claude",
             "mock-awq7b-grok",
-            "cke-3b-history-v2"
+            "mock-e2e-3b-grok",
+            "cke-3b-base",
+            "cke-3b-history-v2",
+            "cke-7b-awq-base"
           ]
         },
         {
@@ -279,14 +278,14 @@
         {
           "title": "Baselines (honest bare)",
           "stage_ids": [
-            "progress-nf4-raw",
-            "cke-3b-base"
+            "progress-nf4-raw"
           ]
         },
         {
           "title": "Interim results",
           "stage_ids": [
             "progress-nf4-routed",
+            "cke-3b-base",
             "cke-3b-history-v2"
           ]
         },
@@ -308,17 +307,16 @@
       "sections": [
         {
           "title": "Baselines (honest bare)",
-          "stage_ids": [
-            "mock-bielik45-fp8-claude",
-            "mock-e2e-3b-grok",
-            "cke-3b-base"
-          ]
+          "stage_ids": []
         },
         {
           "title": "Interim results",
           "stage_ids": [
+            "mock-bielik45-fp8-claude",
             "mock-bielik45-fp8-grok",
-            "mock-awq7b-claude"
+            "mock-awq7b-claude",
+            "mock-e2e-3b-grok",
+            "cke-3b-base"
           ]
         },
         {
