@@ -105,4 +105,6 @@ The page also supports a top-level `prize_tracks` array in `status.json` to driv
 Multi-year corpus work tracks Formula 2023 May history papers for 2023–2026 in `data/history_extended/formulka-2023/`.
 The first pack conversion target is `history-2024-05`, producing `exam.json`, cropped images, and `answers-template.json`.
 `history-2023-mock-v1` remains the only submission-quality gauge; the wider corpus adds coverage but does not replace that benchmark.
+Public status now also records a format-complete Forgehand official mock on `history-2023-mock-v1` for bare `Qwen2.5-7B-Instruct-AWQ`: 37/37 nonempty answers, essay regenerated to 811 words, and about 157s wall once running under the serial HF AutoAWQ path. This is status-only evidence and not an official grade.
+Next up is `Bielik-4.5B FP8` via vLLM under the `<=8.0 GB` base cap; there is no public `Bielik-11B` lane in this board.
 Formula 2015 stays deferred, and this conversion work does not need L40S capacity yet.
