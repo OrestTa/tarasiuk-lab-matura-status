@@ -11,7 +11,7 @@ Public static status board for the Warsaw Model Trainers workstream.
 
 ## CKE category schema
 
-The board now reserves five public CKE categories for every base run and every improvement stage:
+The board now reserves five public CKE columns for every base run and every improvement stage:
 
 - `text_open`
 - `text_closed`
@@ -25,40 +25,48 @@ The page loads data in this order:
 
 1. `public_status.json` if present
 2. `status.json`
-3. optional `scores.json` overlays or supplements the CKE run breakdowns
+3. optional `scores.json` overlays or supplements the CKE stage breakdowns
+
+When full per-item CKE results are available, prefer supplying them and letting the board recompute the five public columns from:
+
+- `gold_category`
+- `needs_image`
+- per-item score/correctness fields
+
+Legacy `by_category` summaries (`closed_choice`, `matching`, `short_open`, `source_analysis`, `true_false`, `essay`) are not enough to reconstruct the text/image split except for `essay`, so the board leaves the other columns as `null` / `—` unless per-item results are present.
 
 ### Expected JSON shape
 
 ```json
 {
   "updated": "2026-09-26T14:33:36.207784+02:00",
-  "cke": {
-    "categories": [
-      { "id": "text_open", "label": "text open" },
-      { "id": "text_closed", "label": "text closed" },
-      { "id": "image_open", "label": "image open" },
-      { "id": "image_closed", "label": "image closed" },
-      { "id": "essay", "label": "essay" }
-    ],
-    "runs": [
-      {
-        "id": "cke-3b-base",
-        "label": "3B base",
-        "model": "Qwen2.5 3B",
-        "stage": "base",
-        "status": "COMPLETED",
-        "overall_pct": 26.7,
-        "categories": {
-          "text_open": { "pct": 30.0, "n": "3/10" },
-          "text_closed": null,
-          "image_open": null,
-          "image_closed": null,
-          "essay": null
-        }
-      }
-    ]
-  }
+  "stages": [
+    {
+      "name": "base",
+      "model": "Qwen2.5 3B",
+      "status": "COMPLETED",
+      "text_open": null,
+      "text_closed": null,
+      "image_open": null,
+      "image_closed": null,
+      "essay": null,
+      "overall_pct": 26.7
+    }
+  ]
 }
 ```
 
-`scores.json` can expose the same run records under either `cke_runs` or `cke.runs`; the page merges those rows by `id`.
+If you have per-item result JSON, a stage can also point at it:
+
+```json
+{
+  "stages": [
+    {
+      "name": "base",
+      "results_path": "./results/qwen25-3b-base.json"
+    }
+  ]
+}
+```
+
+The board will try to recompute `text_open`, `text_closed`, `image_open`, `image_closed`, `essay`, and `overall_pct` from that result file when possible.

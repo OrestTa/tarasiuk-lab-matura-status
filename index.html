@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <title>Tarasiuk Lab - Matura status</title>
 <style>
-  :root { --bg:#0b1020; --card:#141a2e; --text:#e8ecf7; --muted:#9aa3b8; --ok:#3dd68c; --run:#5b8cff; --warn:#f5a524; --bad:#f2555a; --border:#243055; --metric:#1a2342; }
+  :root { --bg:#0b1020; --card:#141a2e; --text:#e8ecf7; --muted:#9aa3b8; --ok:#3dd68c; --run:#5b8cff; --warn:#f5a524; --bad:#f2555a; --border:#243055; }
   * { box-sizing: border-box; }
   body { margin:0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, sans-serif; background: radial-gradient(1200px 600px at 10% -10%, #1a2450, var(--bg)); color: var(--text); }
   main { max-width: 1200px; margin: 0 auto; padding: 28px 18px 64px; }
@@ -28,33 +28,19 @@
   .CANCELLED, .CANCEL_REQUESTED, .FAILED { background: rgba(242,85,90,.15); color: var(--bad); }
   .pct, .mono { font-variant-numeric: tabular-nums; }
   .pct { font-weight: 700; }
-  .run-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(250px, 1fr)); gap:14px; }
-  .run-card { background: rgba(255,255,255,0.02); border:1px solid var(--border); border-radius: 12px; padding: 14px; display:flex; flex-direction:column; gap:12px; }
-  .run-head { display:flex; align-items:flex-start; justify-content:space-between; gap:10px; }
-  .run-head h3 { margin:0; font-size:1rem; }
-  .run-head p { margin:4px 0 0; color:var(--muted); font-size:0.9rem; }
-  .run-overall { min-width: fit-content; text-align:right; }
-  .run-overall strong { display:block; font-size:1.2rem; }
-  .run-overall span { color:var(--muted); font-size:0.8rem; }
-  .metric-grid { display:grid; grid-template-columns:repeat(5, minmax(0, 1fr)); gap:8px; }
-  .metric { background: var(--metric); border-radius: 10px; padding: 10px 8px; min-height: 74px; }
-  .metric-name { display:block; color:var(--muted); font-size:0.75rem; line-height:1.2; text-transform:uppercase; letter-spacing:0.03em; }
-  .metric-value { display:block; margin-top:8px; font-size:1rem; font-weight:700; font-variant-numeric:tabular-nums; }
-  .metric-note { display:block; margin-top:4px; font-size:0.72rem; color:var(--muted); }
-  .run-note { margin:0; color:#d5dbeb; font-size:0.86rem; }
-  .run-source { margin:0; color:var(--muted); font-size:0.8rem; }
+  .dim { color: var(--muted); }
+  .table-wrap { overflow-x: auto; }
+  .cke-table { min-width: 980px; }
+  .cke-table th:nth-child(n+4),
+  .cke-table td:nth-child(n+4):nth-child(-n+8) { text-align: center; }
+  .stage-name { font-weight: 700; }
+  .stage-meta { display:block; margin-top:4px; color:var(--muted); font-size:0.82rem; }
+  .stage-note { color:#d5dbeb; }
+  .stage-source { display:block; margin-top:4px; color:var(--muted); font-size:0.78rem; }
   a { color: #8eb6ff; }
   footer { margin-top: 22px; color: var(--muted); font-size: 0.85rem; }
   .error { color: #ffb4b8; }
   code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
-  @media (max-width: 860px) {
-    .metric-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  }
-  @media (max-width: 520px) {
-    .metric-grid { grid-template-columns: 1fr; }
-    .run-head { flex-direction:column; }
-    .run-overall { text-align:left; }
-  }
 </style>
 </head>
 <body>
@@ -67,9 +53,26 @@
   <div class="card" style="margin-top:14px">
     <div class="section-title">
       <h2>CKE breakdown by category</h2>
-      <p>Every published base run and improvement stage must show: text open, text closed, image open, image closed, essay.</p>
+      <p>Every published base run and improvement stage must always show the five required board columns: text open, text closed, image open, image closed, essay.</p>
     </div>
-    <div id="cke-runs" class="run-grid"></div>
+    <div class="table-wrap">
+      <table class="cke-table">
+        <thead>
+          <tr>
+            <th>stage</th>
+            <th>status</th>
+            <th>overall</th>
+            <th>text open</th>
+            <th>text closed</th>
+            <th>image open</th>
+            <th>image closed</th>
+            <th>essay</th>
+            <th>note</th>
+          </tr>
+        </thead>
+        <tbody id="cke-stages"></tbody>
+      </table>
+    </div>
   </div>
 
   <div class="card" style="margin-top:14px">
@@ -87,7 +90,7 @@
     <ul id="links"></ul>
   </div>
 
-  <footer>No secrets, IPs, or keys on this page. Refresh by updating <code>public_status.json</code> or <code>status.json</code>; optional <code>scores.json</code> can publish per-category CKE splits.</footer>
+  <footer>No secrets, IPs, or keys on this page. Refresh by updating <code>public_status.json</code> or <code>status.json</code>; optional <code>scores.json</code> or per-item result JSON can publish or recompute the five public CKE columns.</footer>
 </main>
 <script>
 const CATEGORY_ORDER = [
@@ -159,35 +162,38 @@ function normalizeMetric(metric) {
   };
 }
 
-function normalizeRun(run = {}) {
-  const runCategories = run.categories ?? run.scores ?? {};
+function normalizeStage(stage = {}) {
+  const stageCategories = stage.categories ?? stage.scores ?? {};
   const metrics = Object.fromEntries(CATEGORY_ORDER.map((category) => [
     category.id,
     normalizeMetric(
-      pickCategoryMetric(runCategories, category.id) ??
-      pickCategoryMetric(run, category.id)
+      pickCategoryMetric(stageCategories, category.id) ??
+      pickCategoryMetric(stage, category.id)
     ),
   ]));
 
-  const overall = normalizeMetric(run.overall ?? {
-    pct: run.overall_pct ?? run.pct,
-    n: run.overall_n ?? run.n,
-    note: run.overall_note,
+  const overall = normalizeMetric(stage.overall ?? {
+    pct: stage.overall_pct ?? stage.pct,
+    n: stage.overall_n ?? stage.n,
+    note: stage.overall_note,
   });
 
-  const model = run.model ?? run.family ?? '';
-  const stage = run.stage ?? run.run ?? '';
+  const model = stage.model ?? stage.family ?? '';
+  const stageName = stage.stage ?? stage.run ?? stage.name ?? stage.label ?? '';
   return {
-    id: run.id ?? run.job_id ?? slugify(`${model}-${stage}-${run.label ?? ''}`),
-    label: run.label ?? ([model, stage].filter(Boolean).join(' ') || 'Unnamed run'),
+    id: stage.id ?? stage.job_id ?? slugify(`${model}-${stageName}`),
+    name: stage.name ?? stage.label ?? ([model, stageName].filter(Boolean).join(' ') || 'Unnamed stage'),
     model,
-    stage,
-    status: run.status ?? 'PENDING',
+    stage: stage.stage ?? '',
+    status: stage.status ?? 'PENDING',
     overall,
-    categories: metrics,
-    note: run.note ?? '',
-    source: run.source ?? '',
-    sort: Number.isFinite(run.sort) ? run.sort : 999,
+    metrics,
+    note: stage.note ?? '',
+    source: stage.source ?? '',
+    byCategory: stage.by_category ?? stage.byCategory ?? null,
+    inlineResults: stage.results && typeof stage.results === 'object' ? stage.results : (Array.isArray(stage.items) ? stage.items : null),
+    resultsPath: stage.results_path ?? stage.results_url ?? stage.items_path ?? stage.items_url ?? '',
+    sort: Number.isFinite(stage.sort) ? stage.sort : 999,
   };
 }
 
@@ -196,17 +202,17 @@ function parseOverallFromDetail(detail) {
   return match ? Number(match[1]) : null;
 }
 
-function deriveCkeRuns(data) {
+function deriveStages(data) {
   return (data.jobs || [])
     .filter((job) => /^cke-/i.test(job.id || '') || /^cke\b/i.test(job.name || ''))
     .map((job, index) => {
-      const label = String(job.name || '').replace(/^CKE\s+/i, '') || job.id || `CKE run ${index + 1}`;
-      const parts = label.split(/\s+/);
+      const name = String(job.name || '').replace(/^CKE\s+/i, '') || job.id || `CKE stage ${index + 1}`;
+      const parts = name.split(/\s+/);
       const model = parts.shift() || '';
       const stage = parts.join(' ') || 'run';
-      return normalizeRun({
-        id: job.id || slugify(label),
-        label,
+      return normalizeStage({
+        id: job.id || slugify(name),
+        name,
         model,
         stage,
         status: job.state,
@@ -218,43 +224,47 @@ function deriveCkeRuns(data) {
     });
 }
 
-function mergeRuns(...collections) {
+function mergeStages(...collections) {
   const merged = new Map();
   for (const collection of collections) {
     for (const candidate of collection || []) {
-      const run = normalizeRun(candidate);
-      const existing = merged.get(run.id);
+      const stage = normalizeStage(candidate);
+      const existing = merged.get(stage.id);
       if (!existing) {
-        merged.set(run.id, run);
+        merged.set(stage.id, stage);
         continue;
       }
-      const categories = { ...existing.categories };
+      const metrics = { ...existing.metrics };
       for (const category of CATEGORY_ORDER) {
-        const nextMetric = run.categories[category.id];
+        const nextMetric = stage.metrics[category.id];
         if (nextMetric && (nextMetric.pct != null || nextMetric.n || nextMetric.note)) {
-          categories[category.id] = nextMetric;
+          metrics[category.id] = nextMetric;
         }
       }
-      merged.set(run.id, {
+      merged.set(stage.id, {
         ...existing,
-        ...run,
-        label: run.label || existing.label,
-        model: run.model || existing.model,
-        stage: run.stage || existing.stage,
-        status: run.status || existing.status,
-        overall: run.overall.pct != null || run.overall.n || run.overall.note ? run.overall : existing.overall,
-        note: run.note || existing.note,
-        source: run.source || existing.source,
-        categories,
-        sort: Math.min(existing.sort, run.sort),
+        ...stage,
+        name: stage.name || existing.name,
+        model: stage.model || existing.model,
+        stage: stage.stage || existing.stage,
+        status: stage.status || existing.status,
+        overall: stage.overall.pct != null || stage.overall.n || stage.overall.note ? stage.overall : existing.overall,
+        note: stage.note || existing.note,
+        source: stage.source || existing.source,
+        metrics,
+        byCategory: stage.byCategory || existing.byCategory,
+        inlineResults: stage.inlineResults || existing.inlineResults,
+        resultsPath: stage.resultsPath || existing.resultsPath,
+        sort: Math.min(existing.sort, stage.sort),
       });
     }
   }
-  return [...merged.values()].sort((left, right) => left.sort - right.sort || left.label.localeCompare(right.label));
+  return [...merged.values()].sort((left, right) => left.sort - right.sort || left.name.localeCompare(right.name));
 }
 
-function extractConfiguredRuns(data) {
+function extractConfiguredStages(data) {
   if (!data) return [];
+  if (Array.isArray(data.stages)) return data.stages;
   if (Array.isArray(data.cke_runs)) return data.cke_runs;
   if (data.cke && Array.isArray(data.cke.runs)) return data.cke.runs;
   if (Array.isArray(data.runs)) return data.runs;
@@ -267,44 +277,198 @@ function metricDisplay(metric) {
   return `${pct}${suffix}`;
 }
 
-function renderCkeRuns(runs) {
-  const container = document.getElementById('cke-runs');
-  if (!runs.length) {
-    container.innerHTML = `<div class="run-card"><p class="run-note">No CKE runs have been published yet.</p></div>`;
+function firstArray(...values) {
+  for (const value of values) {
+    if (Array.isArray(value)) return value;
+  }
+  return [];
+}
+
+function extractItems(payload) {
+  if (Array.isArray(payload)) return payload;
+  if (!payload || typeof payload !== 'object') return [];
+  return firstArray(
+    payload.items,
+    payload.results,
+    payload.samples,
+    payload.records,
+    payload.examples
+  );
+}
+
+function numericValue(...values) {
+  for (const value of values) {
+    if (typeof value === 'number' && Number.isFinite(value)) return value;
+    if (typeof value === 'string' && value.trim() !== '' && !Number.isNaN(Number(value))) return Number(value);
+  }
+  return null;
+}
+
+function inferEarnedPossible(item) {
+  const earned = numericValue(
+    item.points_earned,
+    item.earned_points,
+    item.obtained_points,
+    item.score_value,
+    item.score,
+    item.points
+  );
+  const possible = numericValue(
+    item.points_possible,
+    item.max_points,
+    item.total_points,
+    item.max_score,
+    item.possible_points
+  );
+
+  if (earned != null && possible != null && possible > 0) return { earned, possible };
+
+  const isCorrect = [item.is_correct, item.correct, item.passed, item.pass].find((value) => typeof value === 'boolean');
+  if (typeof isCorrect === 'boolean') return { earned: isCorrect ? 1 : 0, possible: 1 };
+
+  const result = typeof item.result === 'string' ? item.result.toLowerCase() : '';
+  if (['correct', 'passed', 'pass', 'true'].includes(result)) return { earned: 1, possible: 1 };
+  if (['incorrect', 'failed', 'fail', 'false'].includes(result)) return { earned: 0, possible: 1 };
+
+  return null;
+}
+
+function boardCategoryForItem(item) {
+  const goldCategory = String(
+    item.gold_category ??
+    item.goldCategory ??
+    item.category ??
+    item.gold_label ??
+    ''
+  ).trim();
+  const needsImage = Boolean(item.needs_image ?? item.needsImage);
+
+  if (goldCategory === 'essay') return 'essay';
+  if (['short_open', 'source_analysis'].includes(goldCategory)) {
+    return needsImage ? 'image_open' : 'text_open';
+  }
+  if (['closed_choice', 'matching', 'true_false'].includes(goldCategory)) {
+    return needsImage ? 'image_closed' : 'text_closed';
+  }
+  return null;
+}
+
+function roundPct(value) {
+  return Math.round(value * 10) / 10;
+}
+
+function metricFromAggregate(aggregate) {
+  if (!aggregate || aggregate.possible <= 0) return { pct: null, n: '', note: '' };
+  return {
+    pct: roundPct((aggregate.earned / aggregate.possible) * 100),
+    n: `${roundPct(aggregate.earned)}/${roundPct(aggregate.possible)}`,
+    note: aggregate.weighted ? 'pts' : '',
+  };
+}
+
+function transformLegacySummary(byCategory) {
+  if (!byCategory || typeof byCategory !== 'object') return {};
+  const essayMetric = normalizeMetric(byCategory.essay);
+  return essayMetric.pct != null || essayMetric.n || essayMetric.note ? { essay: essayMetric } : {};
+}
+
+function transformStageResults(payload) {
+  const items = extractItems(payload);
+  if (!items.length) return {};
+
+  const grouped = Object.fromEntries(CATEGORY_ORDER.map((category) => [category.id, { earned: 0, possible: 0, weighted: false }]));
+  const overall = { earned: 0, possible: 0, weighted: false };
+
+  for (const item of items) {
+    const score = inferEarnedPossible(item);
+    if (!score) continue;
+
+    overall.earned += score.earned;
+    overall.possible += score.possible;
+    overall.weighted = overall.weighted || score.possible !== 1;
+
+    const bucket = boardCategoryForItem(item);
+    if (!bucket) continue;
+
+    grouped[bucket].earned += score.earned;
+    grouped[bucket].possible += score.possible;
+    grouped[bucket].weighted = grouped[bucket].weighted || score.possible !== 1;
+  }
+
+  const transformed = Object.fromEntries(CATEGORY_ORDER.map((category) => [
+    category.id,
+    metricFromAggregate(grouped[category.id]),
+  ]));
+  return {
+    metrics: transformed,
+    overall: metricFromAggregate(overall),
+  };
+}
+
+function mergeStageTransform(stage, transformed) {
+  if (!transformed) return stage;
+  const metrics = { ...stage.metrics };
+  for (const category of CATEGORY_ORDER) {
+    const nextMetric = transformed.metrics?.[category.id] ?? transformed[category.id];
+    if (nextMetric && (nextMetric.pct != null || nextMetric.n || nextMetric.note)) {
+      metrics[category.id] = normalizeMetric(nextMetric);
+    }
+  }
+  return {
+    ...stage,
+    metrics,
+    overall: transformed.overall && (transformed.overall.pct != null || transformed.overall.n || transformed.overall.note)
+      ? normalizeMetric(transformed.overall)
+      : stage.overall,
+  };
+}
+
+async function hydrateStages(stageCandidates) {
+  const stages = mergeStages(stageCandidates);
+  return Promise.all(stages.map(async (candidate) => {
+    let stage = normalizeStage(candidate);
+    stage = mergeStageTransform(stage, transformLegacySummary(stage.byCategory));
+
+    const payload = stage.inlineResults
+      ? stage.inlineResults
+      : (stage.resultsPath ? await fetchJson(stage.resultsPath) : null);
+
+    if (payload) {
+      stage = mergeStageTransform(stage, transformStageResults(payload));
+      if (stage.resultsPath && !stage.source) {
+        stage.source = stage.resultsPath;
+      }
+    }
+
+    return stage;
+  }));
+}
+
+function renderStageTable(stages) {
+  const tbody = document.getElementById('cke-stages');
+  if (!stages.length) {
+    tbody.innerHTML = `<tr><td colspan="9" class="stage-note">No CKE stages have been published yet.</td></tr>`;
     return;
   }
 
-  container.innerHTML = runs.map((run) => {
-    const metrics = CATEGORY_ORDER.map((category) => {
-      const metric = run.categories[category.id];
-      return `
-        <div class="metric">
-          <span class="metric-name">${escapeHtml(category.label)}</span>
-          <span class="metric-value">${escapeHtml(metricDisplay(metric))}</span>
-          ${metric.note ? `<span class="metric-note">${escapeHtml(metric.note)}</span>` : ''}
-        </div>`;
+  tbody.innerHTML = stages.map((stage) => {
+    const cells = CATEGORY_ORDER.map((category) => {
+      const metric = stage.metrics[category.id];
+      const title = metric.note ? ` title="${escapeHtml(metric.note)}"` : '';
+      return `<td class="pct"${title}>${escapeHtml(metricDisplay(metric))}</td>`;
     }).join('');
-
-    const overall = run.overall.pct != null ? `${run.overall.pct}%${run.overall.n ? ` (${run.overall.n})` : ''}` : '—';
+    const overall = stage.overall.pct != null ? metricDisplay(stage.overall) : '—';
     return `
-      <article class="run-card">
-        <div class="run-head">
-          <div>
-            <h3>${escapeHtml(run.label)}</h3>
-            <p>${escapeHtml(run.model || 'Unknown model')}${run.stage ? ` - ${escapeHtml(run.stage)}` : ''}</p>
-          </div>
-          <div class="run-overall">
-            <strong class="mono">${escapeHtml(overall)}</strong>
-            <span>overall</span>
-          </div>
-        </div>
-        <div>
-          <span class="pill ${escapeHtml(run.status)}">${escapeHtml(run.status)}</span>
-        </div>
-        <div class="metric-grid">${metrics}</div>
-        ${run.note ? `<p class="run-note">${escapeHtml(run.note)}</p>` : ''}
-        ${run.source ? `<p class="run-source">Source: ${escapeHtml(run.source)}</p>` : ''}
-      </article>`;
+      <tr>
+        <td>
+          <span class="stage-name">${escapeHtml(stage.name)}</span>
+          ${(stage.model || stage.stage) ? `<span class="stage-meta">${escapeHtml([stage.model, stage.stage].filter(Boolean).join(' — '))}</span>` : ''}
+        </td>
+        <td><span class="pill ${escapeHtml(stage.status)}">${escapeHtml(stage.status)}</span></td>
+        <td class="pct">${escapeHtml(overall)}</td>
+        ${cells}
+        <td class="stage-note">${escapeHtml(stage.note || '')}${stage.source ? `<span class="stage-source">Source: ${escapeHtml(stage.source)}</span>` : ''}</td>
+      </tr>`;
   }).join('');
 }
 
@@ -355,11 +519,11 @@ async function main() {
   renderMcq(status);
   renderLinks(status);
 
-  const configuredRuns = extractConfiguredRuns(status);
-  const publicRuns = extractConfiguredRuns(publicStatus);
-  const scoreRuns = extractConfiguredRuns(scoreData);
-  const derivedRuns = deriveCkeRuns(status);
-  renderCkeRuns(mergeRuns(derivedRuns, configuredRuns, publicRuns, scoreRuns));
+  const configuredStages = extractConfiguredStages(status);
+  const publicStages = extractConfiguredStages(publicStatus);
+  const scoreStages = extractConfiguredStages(scoreData);
+  const derivedStages = deriveStages(status);
+  renderStageTable(await hydrateStages(mergeStages(derivedStages, configuredStages, publicStages, scoreStages)));
 }
 
 main().catch((error) => {
